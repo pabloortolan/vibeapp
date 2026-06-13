@@ -3,623 +3,556 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mots Croisés du Jour</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>Mots Croisés Quotidiens</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { font-family: 'Inter', sans-serif; }
-  .playfair { font-family: 'Playfair Display', serif; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0f0f13; color: #e8e4d9; min-height: 100vh; }
+  h1, h2, .serif { font-family: 'Playfair Display', serif; }
 
-  #crossword-grid {
-    display: inline-grid;
-    gap: 0;
-    border: 2px solid #27272a;
-    border-radius: 4px;
-    line-height: 0;
-  }
-
-  .gc-black {
+  .cell {
     width: 36px; height: 36px;
-    background: #09090b;
-    flex-shrink: 0;
-  }
-
-  .gc-wrap {
+    border: 1px solid #3a3a4a;
+    background: #1c1c26;
     position: relative;
-    width: 36px; height: 36px;
-    flex-shrink: 0;
-  }
-
-  .gc-num {
-    position: absolute;
-    top: 2px; left: 2px;
-    font-size: 8px;
-    line-height: 1;
-    color: #52525b;
-    pointer-events: none;
-    z-index: 2;
-    font-weight: 600;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .gc-inp {
-    position: absolute;
-    inset: 0;
-    width: 100%; height: 100%;
-    background: #f4f4f5;
-    border: 1.5px solid #3f3f46;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 700;
-    font-family: 'Inter', sans-serif;
-    text-transform: uppercase;
-    color: #09090b;
-    outline: none;
     cursor: pointer;
-    caret-color: transparent;
-    padding-top: 4px;
-    -webkit-tap-highlight-color: transparent;
     user-select: none;
-  }
-  .gc-inp:focus { outline: none; }
-  .gc-inp.word-hi  { background: #451a03; border-color: #78350f; color: #fef3c7; }
-  .gc-inp.cell-hi  { background: #fbbf24; border-color: #d97706; color: #1c1917; }
-
-  .clue-row {
-    display: flex;
-    gap: 8px;
-    padding: 5px 8px;
-    border-radius: 6px;
-    cursor: pointer;
     transition: background 0.12s;
   }
-  .clue-row:hover { background: rgba(255,255,255,0.05); }
-  .clue-row.active {
-    background: rgba(251,191,36,0.08);
-    border-left: 2px solid #f59e0b;
-    padding-left: 6px;
+  .cell.black { background: #0a0a10; border-color: #0a0a10; cursor: default; }
+  .cell.active { background: #2a4a7a; border-color: #4a7acf; }
+  .cell.word-active { background: #1e3050; border-color: #3a5a9a; }
+  .cell.correct { background: #1a3a1a; border-color: #3a7a3a; }
+
+  .cell input {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    background: transparent;
+    border: none; outline: none;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 600;
+    color: #e8e4d9;
+    text-transform: uppercase;
+    cursor: pointer;
+    caret-color: transparent;
   }
-  .clue-num { color: #71717a; font-weight: 600; font-size: 11px; min-width: 20px; padding-top: 2px; flex-shrink: 0; }
-  .clue-row.active .clue-num { color: #fbbf24; }
-  .clue-txt { font-size: 13px; line-height: 1.45; color: #a1a1aa; }
-  .clue-row.active .clue-txt { color: #e4e4e7; }
-
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .spin { animation: spin 0.9s linear infinite; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px) scale(0.96); }
-    to   { opacity: 1; transform: translateY(0)   scale(1); }
+  .cell-num {
+    position: absolute; top: 1px; left: 2px;
+    font-size: 8px; line-height: 1;
+    color: #7a7a9a; pointer-events: none;
+    font-family: 'Inter', sans-serif;
   }
-  .fade-up { animation: fadeUp 0.28s ease-out; }
+
+  .grid-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .crossword-grid { display: inline-grid; gap: 1px; background: #0a0a10; border: 1px solid #3a3a4a; }
+
+  .clue-row { padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: background 0.12s; }
+  .clue-row:hover { background: #1e2030; }
+  .clue-row.active-clue { background: #1e3050; border-left: 3px solid #4a7acf; padding-left: 7px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px 20px; border-radius: 8px; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer; border: none;
+    transition: all 0.15s; user-select: none;
+  }
+  .btn-primary { background: #4a7acf; color: white; }
+  .btn-primary:hover { background: #5a8adf; }
+  .btn-secondary { background: #2a2a3a; color: #e8e4d9; border: 1px solid #3a3a4a; }
+  .btn-secondary:hover { background: #3a3a4a; }
+  .btn-success { background: #3a7a3a !important; color: white !important; }
 
   #toast {
-    transition: opacity 0.25s, transform 0.25s;
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #2a1a1a; color: #e8a0a0; padding: 12px 20px; border-radius: 10px;
+    border: 1px solid #5a3a3a; font-size: 14px; font-weight: 500;
+    opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 100;
+    white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  #mobile-clue-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #16161f; border-top: 1px solid #2a2a3a;
+    padding: 12px 16px; z-index: 50;
+    transform: translateY(100%); transition: transform 0.25s ease;
+  }
+  #mobile-clue-bar.visible { transform: translateY(0); }
+
+  #modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  #modal.show { opacity: 1; pointer-events: all; }
+  #modal-box {
+    background: #16161f; border: 1px solid #3a3a4a; border-radius: 16px;
+    padding: 32px; max-width: 400px; width: 90%; text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .cell { width: 28px; height: 28px; }
+    .cell input { font-size: 12px; }
+    .cell-num { font-size: 7px; }
+    #clues-panel { display: none !important; }
+    #toast { bottom: 90px; }
   }
 </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col select-none">
+<body class="p-4 md:p-8">
 
-<!-- ── Header ─────────────────────────────────────────────────── -->
-<header class="border-b border-zinc-800/70 px-4 py-3 flex items-center justify-between sticky top-0 z-40 bg-zinc-950/95 backdrop-blur-sm shrink-0">
-  <div class="flex items-center gap-3 min-w-0">
-    <div class="min-w-0">
-      <h1 class="playfair text-lg font-bold text-white leading-tight tracking-wide">Mots Croisés du Jour</h1>
-      <p id="hdr-date" class="text-[11px] text-zinc-600 leading-none mt-0.5 hidden sm:block"></p>
+<!-- Header -->
+<div class="max-w-5xl mx-auto">
+  <div class="flex items-center justify-between mb-1">
+    <div>
+      <h1 class="serif text-2xl md:text-3xl font-bold text-amber-100">Mots Croisés Quotidiens</h1>
+      <p id="theme-label" class="text-sm text-slate-400 mt-0.5"></p>
+    </div>
+    <div class="flex items-center gap-3 text-sm text-slate-400">
+      <span id="timer-display" class="font-mono text-base text-slate-300">00:00</span>
+      <span id="tries-display" class="text-xs px-2 py-1 rounded bg-slate-800 border border-slate-700">Aucune erreur</span>
     </div>
   </div>
-  <div class="flex items-center gap-2 shrink-0">
-    <div class="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5">
-      <svg class="w-3 h-3 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-      <span id="timer" class="font-mono text-sm font-semibold text-zinc-200 tabular-nums">00:00</span>
-    </div>
-    <button id="verify-btn"
-      class="px-3.5 py-1.5 rounded-lg text-sm font-semibold border transition-all duration-150 bg-zinc-900 text-zinc-600 border-zinc-800 cursor-not-allowed"
-      disabled>Vérifier</button>
-  </div>
-</header>
+  <div class="h-px bg-slate-700 mb-4"></div>
 
-<!-- ── Loading ────────────────────────────────────────────────── -->
-<div id="loading" class="flex-1 flex flex-col items-center justify-center gap-3">
-  <div class="w-7 h-7 border-2 border-zinc-800 border-t-emerald-500 rounded-full spin"></div>
-  <p class="text-zinc-600 text-sm">Génération du puzzle…</p>
+  <!-- Main layout -->
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Grid -->
+    <div class="flex-1">
+      <div class="grid-wrapper">
+        <div id="crossword-grid" class="crossword-grid"></div>
+      </div>
+      <div class="flex gap-3 mt-4">
+        <button class="btn btn-primary" onclick="verify()">Vérifier</button>
+        <button id="share-btn" class="btn btn-secondary" onclick="share()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+          <span id="share-btn-text">Partager</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Clues panel (hidden on mobile via CSS) -->
+    <div id="clues-panel" class="lg:w-72 flex-shrink-0">
+      <div class="mb-4">
+        <h2 class="serif text-lg font-bold text-amber-100 mb-2">Horizontalement</h2>
+        <div id="clues-across" class="space-y-0.5 text-sm text-slate-300"></div>
+      </div>
+      <div>
+        <h2 class="serif text-lg font-bold text-amber-100 mb-2">Verticalement</h2>
+        <div id="clues-down" class="space-y-0.5 text-sm text-slate-300"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ── Game ───────────────────────────────────────────────────── -->
-<main id="game" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden" style="max-height:calc(100vh - 57px)">
+<!-- Toast -->
+<div id="toast"></div>
 
-  <!-- Grid side -->
-  <div class="flex-1 flex flex-col items-center justify-start lg:justify-center overflow-auto p-4 lg:p-6">
-    <div id="crossword-grid"></div>
-    <p class="mt-3 text-[11px] text-zinc-700 italic text-center" id="source-note"></p>
-  </div>
-
-  <div class="hidden lg:block w-px bg-zinc-800/60 self-stretch"></div>
-  <div class="lg:hidden h-px bg-zinc-800/60 shrink-0"></div>
-
-  <!-- Clues side -->
-  <div class="w-full lg:w-80 xl:w-[22rem] flex flex-col overflow-hidden shrink-0">
-    <div class="flex-1 overflow-y-auto p-4 lg:p-5 space-y-6">
-
-      <section>
-        <h3 class="playfair text-xs font-bold text-zinc-500 uppercase tracking-[0.18em] mb-2.5 flex items-center gap-2">
-          <span class="flex-1 h-px bg-zinc-800"></span>Horizontale<span class="flex-1 h-px bg-zinc-800"></span>
-        </h3>
-        <div id="clues-across" class="space-y-0.5"></div>
-      </section>
-
-      <section>
-        <h3 class="playfair text-xs font-bold text-zinc-500 uppercase tracking-[0.18em] mb-2.5 flex items-center gap-2">
-          <span class="flex-1 h-px bg-zinc-800"></span>Verticale<span class="flex-1 h-px bg-zinc-800"></span>
-        </h3>
-        <div id="clues-down" class="space-y-0.5"></div>
-      </section>
-
-    </div>
-  </div>
-</main>
-
-<!-- ── Toast ──────────────────────────────────────────────────── -->
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 text-zinc-100 text-sm font-medium px-5 py-2.5 rounded-full shadow-2xl z-50 opacity-0 pointer-events-none" style="transform:translateX(-50%) translateY(6px)">
-  <span id="toast-msg"></span>
+<!-- Mobile clue bar -->
+<div id="mobile-clue-bar">
+  <p class="text-xs text-slate-500 mb-1" id="mobile-clue-label"></p>
+  <p class="text-sm text-slate-200 font-medium" id="mobile-clue-text"></p>
 </div>
 
-<!-- ── Success Modal ──────────────────────────────────────────── -->
-<div id="modal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4" style="backdrop-filter:blur(6px)">
-  <div class="fade-up bg-zinc-900 border border-zinc-700/80 rounded-2xl p-8 max-w-xs w-full shadow-2xl text-center">
-    <div class="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center mx-auto mb-5">
-      <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
-    </div>
-    <h2 class="playfair text-2xl font-bold text-white mb-1">Félicitations&nbsp;!</h2>
-    <p class="text-zinc-500 text-sm mb-5">Puzzle du jour complété</p>
-    <div class="bg-zinc-950/60 rounded-xl border border-zinc-800 p-4 mb-5">
-      <p class="text-xs text-zinc-600 mb-1">Temps</p>
-      <p id="modal-time" class="font-mono text-3xl font-bold text-emerald-400">00:00</p>
-    </div>
-    <p id="modal-date" class="text-xs text-zinc-700 mb-5"></p>
-    <button id="share-btn" class="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition-colors mb-2.5 text-sm">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-      Partager
-    </button>
-    <button onclick="document.getElementById('modal').classList.add('hidden')" class="w-full text-zinc-600 hover:text-zinc-400 text-sm py-2 transition-colors">Fermer</button>
+<!-- Success modal -->
+<div id="modal">
+  <div id="modal-box">
+    <div class="text-4xl mb-3">&#x26F3;</div>
+    <h2 class="serif text-2xl font-bold text-amber-100 mb-1">Bravo !</h2>
+    <p class="text-slate-400 text-sm mb-2" id="modal-time"></p>
+    <p class="text-slate-400 text-sm mb-5" id="modal-tries"></p>
+    <button class="btn btn-primary w-full" onclick="closeModal()">Fermer</button>
   </div>
 </div>
 
 <script>
-'use strict';
+// ─── State ────────────────────────────────────────────────────────────────────
+const S = {
+  dateStr: '', theme: '',
+  gridSize: { rows: 0, cols: 0 },
+  words: [],
+  gridMap: new Map(),  // "r,c" -> correct letter
+  numMap: new Map(),   // "r,c" -> clue number
+  wordMap: new Map(),  // "r,c" -> [{wordIdx, pos}]
+  userInput: new Map(),
+  sel: null,
+  dir: 'H',
+  secs: 0, timerID: null, done: false,
+  tries: 0
+};
 
-// ── PRNG ──────────────────────────────────────────────────────────────────────
-function mulberry32(seed) {
-  return () => {
-    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-function strToSeed(s) {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
-  return h;
-}
-function seededShuffle(arr, rng) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
-  return a;
-}
-
-// ── Date ──────────────────────────────────────────────────────────────────────
+// ─── Date ─────────────────────────────────────────────────────────────────────
 function todayStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-function fmtDateFR(s) {
-  const [y,m,d] = s.split('-');
-  const M = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  return `${+d} ${M[+m-1]} ${y}`;
-}
-function fmtTime(s) { return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
 
-// ── Golf fallback ─────────────────────────────────────────────────────────────
-const GOLF = [
-  {word:'DRIVER',  clue:'Le ______ est le club utilisé au départ pour envoyer la balle à la plus grande distance possible.'},
-  {word:'GREEN',   clue:'Le ______ est la zone de gazon ras autour du trou où l\'on utilise le putter.'},
-  {word:'BIRDIE',  clue:'Réaliser un ______ signifie terminer un trou en un coup de moins que le par.'},
-  {word:'PUTTER',  clue:'Le ______ est le club spécialisé pour faire rouler la balle sur le green vers le trou.'},
-  {word:'BUNKER',  clue:'Un ______ est un obstacle de sable creusé dans le terrain pour piéger la balle.'},
-  {word:'EAGLE',   clue:'Terminer un trou en deux coups sous le par se nomme un ______ dans le vocabulaire du golf.'},
-  {word:'CADDIE',  clue:'Le ______ porte le sac du joueur, conseille sur le choix du club et la stratégie.'},
-  {word:'BOGEY',   clue:'Un ______ correspond à un score d\'un coup de plus que le par sur un trou.'},
-  {word:'ALBATROS',clue:'L\'______ représente trois coups sous le par sur un trou, performance rarissime au golf.'},
-  {word:'FAIRWAY', clue:'Le ______ est la partie centrale entretenue du parcours reliant le départ au green.'},
-  {word:'HANDICAP',clue:'Le ______ est un système de compensation permettant à des joueurs de niveaux différents de se mesurer.'},
-  {word:'PARCOURS',clue:'Un ______ de golf compte généralement dix-huit trous répartis sur un grand domaine paysager.'},
-  {word:'SWING',   clue:'Le ______ désigne le mouvement complet du joueur pour frapper la balle avec le club.'},
-  {word:'ROUGH',   clue:'Le ______ est la zone d\'herbe haute non entretenue qui borde le fairway et pénalise le jeu.'},
-  {word:'TROU',    clue:'Le ______ creusé dans le green, d\'un diamètre de 108 mm, est le but à atteindre.'},
-  {word:'OPEN',    clue:'Le British ______ est l\'un des quatre tournois majeurs du Grand Chelem du golf mondial.'},
-  {word:'PUTT',    clue:'Le ______ est le coup joué sur le green pour faire rentrer la balle dans le trou.'},
-  {word:'CHIP',    clue:'Le ______ est un petit coup d\'approche lobé depuis les abords du green vers le trou.'},
-  {word:'CLUB',    clue:'Le ______ est l\'instrument frappant la balle; chaque joueur peut en porter jusqu\'à quatorze.'},
-  {word:'STROKE',  clue:'Chaque ______ correspond à un coup joué par le golfeur tout au long de la partie.'},
-];
-
-// ── Stop words ────────────────────────────────────────────────────────────────
-const STOPS = new Set('le la les de du des un une et est en au aux par pour sur dans avec que qui ce se sa son ses leur leurs il elle ils elles nous vous je tu mais ou donc or ni car tout plus tres bien meme aussi comme quand alors encore toujours apres avant sous entre contre chez vers depuis sans lors deja chaque autre peu trop jamais souvent parfois ici cependant toutefois pourtant plusieurs certain certains cette cet ces mon ton ma ta nos vos sont etait avait ont fait peut doit veut vient semble reste prend donne dit voir aller venir faire prendre donner tenir vouloir pouvoir devoir savoir mettre rendre passer partir voici voila cela ceci ceux celui celle quoi donc ainsi puis laquelle lequel lesquels duquel desquels etaient avaient sera serait seront seraient avons avez'.split(' '));
-
-// ── NLP ───────────────────────────────────────────────────────────────────────
-function stripAccents(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g,''); }
-
-function extractWords(text, rng) {
-  text = text.replace(/<[^>]+>/g,' ').replace(/\([^)]{0,150}\)/g,' ').replace(/\[[^\]]{0,60}\]/g,' ');
-  const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 25);
-  const map = new Map();
-  for (const sent of sentences) {
-    const tokens = sent.match(/[A-Za-zÀ-ÿ]{4,10}/g) || [];
-    for (const tok of tokens) {
-      const norm = stripAccents(tok.toUpperCase());
-      if (!/^[A-Z]{4,10}$/.test(norm)) continue;
-      const low = stripAccents(tok.toLowerCase());
-      if (STOPS.has(low) || STOPS.has(tok.toLowerCase())) continue;
-      if (!map.has(norm)) {
-        const clue = sent.replace(new RegExp('\\b'+tok+'\\b','gi'),'______').trim();
-        if (clue.includes('______') && clue.length > 15) map.set(norm,{word:norm,clue});
-      }
-    }
-  }
-  return seededShuffle([...map.values()], rng).slice(0, 30);
-}
-
-// ── Wikipedia fetch ───────────────────────────────────────────────────────────
-async function fetchWiki(dateStr, rng) {
-  const [y,m,d] = dateStr.split('-');
+// ─── Load puzzle ──────────────────────────────────────────────────────────────
+async function loadPuzzle() {
+  S.dateStr = todayStr();
+  let data = null;
   try {
-    const r = await fetch(`https://fr.wikipedia.org/api/rest_v1/page/featured/${y}/${m}/${d}`,
-      {headers:{Accept:'application/json'}});
-    if (!r.ok) throw 0;
-    const data = await r.json();
-    let txt = '';
-    if (data.tfa?.extract)      txt += data.tfa.extract + ' ';
-    if (data.mostread?.articles) data.mostread.articles.slice(0,6).forEach(a => { if(a.extract) txt+=a.extract+' '; });
-    if (data.news)               data.news.slice(0,4).forEach(n => { if(n.story) txt+=n.story+' '; });
-    if (txt.length < 400) throw 0;
-    const words = extractWords(txt, rng);
-    if (words.length < 14) throw 0;
-    return { words, title: data.tfa?.title || '' };
-  } catch {
-    return null;
+    const r = await fetch(`data/${S.dateStr}.json`);
+    if (r.ok) data = await r.json();
+  } catch(e) {}
+  if (!data) {
+    try {
+      const r = await fetch('data/golf-fallback.json');
+      if (r.ok) data = await r.json();
+    } catch(e) {}
   }
-}
-
-// ── Grid builder ──────────────────────────────────────────────────────────────
-class Grid {
-  constructor(rng) { this.rng=rng; this.g=new Map(); this.placed=[]; }
-  key(r,c){return r+','+c;}
-  at(r,c){return this.g.get(this.key(r,c));}
-  put(r,c,l){this.g.set(this.key(r,c),l);}
-
-  build(words) {
-    const sorted = [...words].sort((a,b)=>b.word.length-a.word.length);
-    this._place(sorted[0],0,0,'across');
-    for (let i=1;i<sorted.length;i++) this._try(sorted[i]);
-    return this.placed;
-  }
-
-  _place(wo,row,col,dir) {
-    const cells=[];
-    for(let i=0;i<wo.word.length;i++){
-      const r=dir==='across'?row:row+i, c=dir==='across'?col+i:col;
-      this.put(r,c,wo.word[i]); cells.push({r,c});
-    }
-    this.placed.push({...wo,row,col,dir,cells,number:0});
-  }
-
-  _canPlace(word,row,col,dir){
-    for(let i=0;i<word.length;i++){
-      const r=dir==='across'?row:row+i, c=dir==='across'?col+i:col;
-      const ex=this.at(r,c);
-      if(ex!==undefined){if(ex!==word[i])return false;}
-      else{
-        if(dir==='across'){if(this.at(r-1,c)!==undefined||this.at(r+1,c)!==undefined)return false;}
-        else{if(this.at(r,c-1)!==undefined||this.at(r,c+1)!==undefined)return false;}
-      }
-    }
-    if(dir==='across'){if(this.at(row,col-1)!==undefined||this.at(row,col+word.length)!==undefined)return false;}
-    else{if(this.at(row-1,col)!==undefined||this.at(row+word.length,col)!==undefined)return false;}
-    return true;
-  }
-
-  _try(wo) {
-    const {word}=wo; const cands=[];
-    for(const p of this.placed){
-      const nd=p.dir==='across'?'down':'across';
-      for(let pi=0;pi<p.word.length;pi++)for(let wi=0;wi<word.length;wi++){
-        if(p.word[pi]!==word[wi])continue;
-        const row=nd==='down'?p.row-wi:p.row+pi, col=nd==='down'?p.col+pi:p.col-wi;
-        if(!this._canPlace(word,row,col,nd))continue;
-        let sc=0; for(let i=0;i<word.length;i++){const r=nd==='across'?row:row+i,c=nd==='across'?col+i:col;if(this.at(r,c))sc++;}
-        cands.push({row,col,dir:nd,sc});
-      }
-    }
-    if(!cands.length)return false;
-    cands.sort((a,b)=>b.sc-a.sc||(this.rng()-0.5));
-    this._place(wo,cands[0].row,cands[0].col,cands[0].dir);
-    return true;
-  }
-
-  bounds(){
-    let r0=Infinity,r1=-Infinity,c0=Infinity,c1=-Infinity;
-    for(const k of this.g.keys()){const[r,c]=k.split(',').map(Number);r0=Math.min(r0,r);r1=Math.max(r1,r);c0=Math.min(c0,c);c1=Math.max(c1,c);}
-    return{r0,r1,c0,c1};
-  }
-}
-
-function buildGrid(words, seed) {
-  for (let attempt=0;attempt<12;attempt++){
-    const rng=mulberry32(seed+attempt*7919);
-    const shuffled=seededShuffle(words,rng).slice(0,26);
-    const g=new Grid(rng);
-    const placed=g.build(shuffled);
-    if(placed.length>=15){
-      const use=placed.slice(0,20);
-      // Rebuild clean grid from only used words
-      const clean=new Map();
-      for(const p of use) for(let i=0;i<p.word.length;i++){const{r,c}=p.cells[i];clean.set(r+','+c,p.word[i]);}
-      return{placed:use,gridMap:clean,bounds:g.bounds()};
-    }
-  }
-  return null;
-}
-
-// ── Number cells ──────────────────────────────────────────────────────────────
-function numberWords(placed) {
-  const starts=new Map();
-  for(const p of placed) starts.set(p.row+','+p.col,true);
-  const sorted=[...starts.keys()].sort((a,b)=>{const[ar,ac]=a.split(',').map(Number),[br,bc]=b.split(',').map(Number);return ar!==br?ar-br:ac-bc;});
-  const numMap=new Map(); sorted.forEach((k,i)=>numMap.set(k,i+1));
-  const across=[],down=[];
-  for(const p of placed){p.number=numMap.get(p.row+','+p.col);(p.dir==='across'?across:down).push(p);}
-  across.sort((a,b)=>a.number-b.number); down.sort((a,b)=>a.number-b.number);
-  return{numMap,across,down};
-}
-
-// ── App state ─────────────────────────────────────────────────────────────────
-const S = {
-  dateStr:'', placed:[], across:[], down:[], numMap:new Map(), gridMap:new Map(), bounds:null,
-  userInput:new Map(), sel:null, dir:'across',
-  secs:0, timerID:null, done:false,
-};
-
-// ── localStorage ──────────────────────────────────────────────────────────────
-const LSKEY = ()=>'mots-croises-'+S.dateStr;
-function save(){try{localStorage.setItem(LSKEY(),JSON.stringify({inp:[...S.userInput],secs:S.secs,done:S.done}));}catch{}}
-function load(){try{const d=JSON.parse(localStorage.getItem(LSKEY())||'null');if(!d)return false;S.userInput=new Map(d.inp||[]);S.secs=d.secs||0;S.done=!!d.done;return true;}catch{return false;}}
-
-// ── Timer ─────────────────────────────────────────────────────────────────────
-function startTimer(){if(S.timerID)return;S.timerID=setInterval(()=>{if(!S.done){S.secs++;document.getElementById('timer').textContent=fmtTime(S.secs);if(S.secs%15===0)save();}},1000);}
-function stopTimer(){clearInterval(S.timerID);S.timerID=null;}
-
-// ── Toast ─────────────────────────────────────────────────────────────────────
-let _tID;
-function toast(msg,ms=2600){
-  const el=document.getElementById('toast');
-  document.getElementById('toast-msg').textContent=msg;
-  el.style.opacity='1'; el.style.transform='translateX(-50%) translateY(0)';
-  clearTimeout(_tID); _tID=setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(-50%) translateY(6px)';},ms);
-}
-
-// ── Highlight ─────────────────────────────────────────────────────────────────
-function wordAt(r,c,dir){return S.placed.find(p=>p.dir===dir&&p.cells.some(cl=>cl.r===r&&cl.c===c));}
-function inp(r,c){return document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);}
-
-function highlight(){
-  document.querySelectorAll('.gc-inp').forEach(el=>el.classList.remove('word-hi','cell-hi'));
-  document.querySelectorAll('.clue-row').forEach(el=>el.classList.remove('active'));
-  if(!S.sel)return;
-  const{r,c}=S.sel; const w=wordAt(r,c,S.dir);
-  if(w){
-    w.cells.forEach(cl=>{const el=inp(cl.r,cl.c);if(el)el.classList.add('word-hi');});
-    const ce=inp(r,c); if(ce){ce.classList.remove('word-hi');ce.classList.add('cell-hi');}
-    const cl=document.getElementById(`cl-${w.dir}-${w.number}`);
-    if(cl){cl.classList.add('active');cl.scrollIntoView({block:'nearest',behavior:'smooth'});}
-  } else {
-    const ce=inp(r,c); if(ce) ce.classList.add('cell-hi');
-  }
-}
-
-// ── Navigation ────────────────────────────────────────────────────────────────
-function moveTo(r,c){if(S.gridMap.has(r+','+c)){S.sel={r,c};highlight();inp(r,c)?.focus();}}
-function advance(r,c){const dr=S.dir==='down'?1:0,dc=S.dir==='across'?1:0;moveTo(r+dr,c+dc);}
-function retreat(r,c){const dr=S.dir==='down'?-1:0,dc=S.dir==='across'?-1:0;moveTo(r+dr,c+dc);}
-
-// ── Events ────────────────────────────────────────────────────────────────────
-function onCellClick(r,c){
-  if(S.done)return;
-  if(S.sel&&S.sel.r===r&&S.sel.c===c){const opp=S.dir==='across'?'down':'across';if(wordAt(r,c,opp))S.dir=opp;}
-  else{if(!wordAt(r,c,S.dir)){const opp=S.dir==='across'?'down':'across';if(wordAt(r,c,opp))S.dir=opp;}}
-  S.sel={r,c}; highlight();
-}
-function onKeyDown(e,r,c){
-  if(S.done)return;
-  if(e.key==='ArrowRight'){e.preventDefault();moveTo(r,c+1);}
-  else if(e.key==='ArrowLeft'){e.preventDefault();moveTo(r,c-1);}
-  else if(e.key==='ArrowDown'){e.preventDefault();moveTo(r+1,c);}
-  else if(e.key==='ArrowUp'){e.preventDefault();moveTo(r-1,c);}
-  else if(e.key==='Tab'){e.preventDefault();const opp=S.dir==='across'?'down':'across';if(wordAt(r,c,opp)){S.dir=opp;highlight();}}
-  else if(e.key==='Backspace'){
-    e.preventDefault();
-    const el=inp(r,c);
-    if(el&&el.value){el.value='';S.userInput.delete(r+','+c);updateBtn();save();}
-    else{retreat(r,c);const ps=S.sel;if(ps){const pi=inp(ps.r,ps.c);if(pi&&pi.value){pi.value='';S.userInput.delete(ps.r+','+ps.c);updateBtn();save();}}}
-  }
-}
-function onInput(e,r,c){
-  if(S.done)return;
-  const el=e.target, raw=el.value.toUpperCase().replace(/[^A-Z]/g,'');
-  el.value=raw?raw[raw.length-1]:'';
-  if(el.value){S.userInput.set(r+','+c,el.value);advance(r,c);}
-  else S.userInput.delete(r+','+c);
-  updateBtn(); save();
-}
-
-// ── Verify button state ───────────────────────────────────────────────────────
-function updateBtn(){
-  const filled=[...S.gridMap.keys()].every(k=>{const v=S.userInput.get(k);return v&&v.length>0;});
-  const btn=document.getElementById('verify-btn');
-  if(filled){
-    btn.disabled=false;
-    btn.className='px-3.5 py-1.5 rounded-lg text-sm font-semibold border transition-all duration-150 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white border-emerald-500 cursor-pointer';
-  } else {
-    btn.disabled=true;
-    btn.className='px-3.5 py-1.5 rounded-lg text-sm font-semibold border transition-all duration-150 bg-zinc-900 text-zinc-600 border-zinc-800 cursor-not-allowed';
-  }
-}
-
-// ── Verify ────────────────────────────────────────────────────────────────────
-function verify(){
-  const ok=[...S.gridMap.entries()].every(([k,correct])=>S.userInput.get(k)===correct);
-  if(ok){S.done=true;stopTimer();save();showModal();}
-  else toast('La grille contient des erreurs.');
-}
-
-// ── Success modal ─────────────────────────────────────────────────────────────
-function showModal(){
-  document.getElementById('modal-time').textContent=fmtTime(S.secs);
-  const[y,m,d]=S.dateStr.split('-');
-  document.getElementById('modal-date').textContent=`${d}/${m}/${y}`;
-  document.getElementById('modal').classList.remove('hidden');
-}
-
-// ── Share ─────────────────────────────────────────────────────────────────────
-function share(){
-  const[y,m,d]=S.dateStr.split('-');
-  const txt=[
-    'Mots Croisés du Jour 🧩',
-    `Date : ${d}/${m}/${y}`,
-    `Temps : ${fmtTime(S.secs)} ⏱️`,
-    'Difficulté : Hardcore (Sans indices révélés)',
-    '',
-    '🟩'.repeat(9),
-    '',
-    'https://pabloortolan.github.io/vibeapp',
-  ].join('\n');
-  navigator.clipboard.writeText(txt).then(()=>toast('Copié dans le presse-papiers !')).catch(()=>toast('Impossible de copier.'));
-}
-
-// ── Render grid ───────────────────────────────────────────────────────────────
-function renderGrid(){
-  const{r0,r1,c0,c1}=S.bounds;
-  const cols=c1-c0+1, rows=r1-r0+1;
-  const el=document.getElementById('crossword-grid');
-  el.innerHTML='';
-  el.style.gridTemplateColumns=`repeat(${cols},36px)`;
-  el.style.gridTemplateRows=`repeat(${rows},36px)`;
-
-  for(let r=r0;r<=r1;r++)for(let c=c0;c<=c1;c++){
-    const letter=S.gridMap.get(r+','+c);
-    if(!letter){const b=document.createElement('div');b.className='gc-black';el.appendChild(b);continue;}
-    const wrap=document.createElement('div'); wrap.className='gc-wrap';
-    const num=S.numMap.get(r+','+c);
-    if(num){const ns=document.createElement('span');ns.className='gc-num';ns.textContent=num;wrap.appendChild(ns);}
-    const input=document.createElement('input');
-    input.className='gc-inp'; input.type='text'; input.maxLength=1;
-    input.autocomplete='off'; input.autocorrect='off'; input.autocapitalize='characters'; input.spellcheck=false;
-    input.dataset.r=r; input.dataset.c=c;
-    const saved=S.userInput.get(r+','+c); if(saved)input.value=saved;
-    input.addEventListener('click',()=>onCellClick(r,c));
-    input.addEventListener('keydown',e=>onKeyDown(e,r,c));
-    input.addEventListener('input',e=>onInput(e,r,c));
-    wrap.appendChild(input); el.appendChild(wrap);
-  }
-}
-
-// ── Render clues ──────────────────────────────────────────────────────────────
-function renderClues(){
-  function make(item){
-    const d=document.createElement('div'); d.className='clue-row'; d.id=`cl-${item.dir}-${item.number}`;
-    const ns=document.createElement('span'); ns.className='clue-num'; ns.textContent=item.number+'.';
-    const ts=document.createElement('span'); ts.className='playfair clue-txt';
-    ts.textContent=(item.clue.length>130?item.clue.slice(0,127)+'…':item.clue)+` (${item.word.length})`;
-    d.appendChild(ns); d.appendChild(ts);
-    d.addEventListener('click',()=>{
-      S.dir=item.dir; S.sel={r:item.row,c:item.col}; highlight();
-      // Jump to first empty cell in this word
-      for(const cl of item.cells){if(!S.userInput.get(cl.r+','+cl.c)){moveTo(cl.r,cl.c);return;}}
-      moveTo(item.row,item.col);
-    });
-    return d;
-  }
-  const ac=document.getElementById('clues-across'), dn=document.getElementById('clues-down');
-  ac.innerHTML=''; dn.innerHTML='';
-  S.across.forEach(w=>ac.appendChild(make(w)));
-  S.down.forEach(w=>dn.appendChild(make(w)));
-}
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-async function init(){
-  const dateStr=todayStr(); S.dateStr=dateStr;
-  document.getElementById('hdr-date').textContent=fmtDateFR(dateStr);
-  document.getElementById('timer').textContent='00:00';
-
-  const seed=strToSeed(dateStr);
-  const rng=mulberry32(seed);
-
-  // Fetch Wikipedia
-  const wiki=await fetchWiki(dateStr,rng);
-  let wordList=wiki?.words||null;
-  let sourceNote='';
-
-  if(!wordList||wordList.length<14){wordList=GOLF;sourceNote='Thème du jour : Le Golf';}
-  else if(wiki?.title) sourceNote=`Source : ${wiki.title}`;
-
-  // Build grid (retry until 15+ words or fall back to golf)
-  let result=buildGrid(wordList,seed);
-  if(!result){wordList=GOLF;result=buildGrid(wordList,seed);}
-  if(!result){
-    document.getElementById('loading').innerHTML='<p class="text-red-500 text-sm">Erreur de génération. Veuillez recharger la page.</p>';
+  if (!data) {
+    document.body.innerHTML = '<p class="p-8 text-red-400">Impossible de charger le puzzle.</p>';
     return;
   }
+  initPuzzle(data);
+}
 
-  S.placed=result.placed; S.gridMap=result.gridMap; S.bounds=result.bounds;
-  const{numMap,across,down}=numberWords(S.placed);
-  S.numMap=numMap; S.across=across; S.down=down;
+// ─── Init ─────────────────────────────────────────────────────────────────────
+function initPuzzle(data) {
+  S.theme = data.theme || '';
+  S.gridSize = data.gridSize;
+  S.words = data.words.map(w => ({ ...w, word: w.word.toUpperCase() }));
 
-  // Load saved state
-  load();
+  document.getElementById('theme-label').textContent = S.theme ? `Thème : ${S.theme}` : '';
 
-  // Show UI
-  document.getElementById('loading').classList.add('hidden');
-  document.getElementById('game').classList.remove('hidden');
-  document.getElementById('source-note').textContent=sourceNote;
+  S.gridMap.clear(); S.numMap.clear(); S.wordMap.clear();
+
+  S.words.forEach((w, wi) => {
+    for (let i = 0; i < w.word.length; i++) {
+      const r = w.direction === 'H' ? w.row : w.row + i;
+      const c = w.direction === 'H' ? w.col + i : w.col;
+      const key = `${r},${c}`;
+      S.gridMap.set(key, w.word[i]);
+      if (!S.wordMap.has(key)) S.wordMap.set(key, []);
+      S.wordMap.get(key).push({ wordIdx: wi, pos: i });
+    }
+  });
+
+  // Assign clue numbers sorted by row then col
+  const seen = new Map();
+  let num = 1;
+  const starts = S.words.map((w, wi) => ({ r: w.row, c: w.col, wi }))
+    .sort((a, b) => a.r !== b.r ? a.r - b.r : a.c - b.c);
+
+  starts.forEach(({ r, c, wi }) => {
+    const key = `${r},${c}`;
+    if (!seen.has(key)) { seen.set(key, num); S.numMap.set(key, num); num++; }
+    S.words[wi].num = seen.get(key);
+  });
+
+  const saved = loadProgress();
+  S.userInput = saved ? saved.inp : new Map();
+  S.secs      = saved ? saved.secs : 0;
+  S.done      = saved ? saved.done : false;
+  S.tries     = saved ? (saved.tries || 0) : 0;
 
   renderGrid();
   renderClues();
-  updateBtn();
-  document.getElementById('timer').textContent=fmtTime(S.secs);
+  updateTriesDisplay();
+  updateTimerDisplay();
 
-  if(S.done){
-    // Restore completed state
-    const btn=document.getElementById('verify-btn');
-    btn.textContent='✓ Résolu'; btn.disabled=true;
-    btn.className='px-3.5 py-1.5 rounded-lg text-sm font-semibold border bg-zinc-900 text-emerald-600 border-zinc-800 cursor-default';
-    setTimeout(showModal,400);
-  } else {
-    startTimer();
-    // Select first word
-    if(S.across.length){const f=S.across[0];S.dir='across';S.sel={r:f.row,c:f.col};highlight();}
-  }
-
-  document.getElementById('verify-btn').addEventListener('click',()=>{if(!S.done&&!document.getElementById('verify-btn').disabled)verify();});
-  document.getElementById('share-btn').addEventListener('click',share);
+  if (!S.done) startTimer();
+  else showDoneState();
 }
 
-init();
+// ─── Grid rendering ───────────────────────────────────────────────────────────
+function renderGrid() {
+  const grid = document.getElementById('crossword-grid');
+  const { rows, cols } = S.gridSize;
+  grid.style.gridTemplateColumns = `repeat(${cols}, auto)`;
+  grid.innerHTML = '';
+
+  for (let r = 1; r <= rows; r++) {
+    for (let c = 1; c <= cols; c++) {
+      const key = `${r},${c}`;
+      const div = document.createElement('div');
+      div.className = 'cell' + (S.gridMap.has(key) ? '' : ' black');
+      div.dataset.r = r; div.dataset.c = c;
+
+      if (S.gridMap.has(key)) {
+        const num = S.numMap.get(key);
+        if (num) {
+          const n = document.createElement('span');
+          n.className = 'cell-num';
+          n.textContent = num;
+          div.appendChild(n);
+        }
+        const inp = document.createElement('input');
+        inp.type = 'text'; inp.maxLength = 1;
+        inp.autocomplete = 'off'; inp.autocorrect = 'off';
+        inp.autocapitalize = 'characters'; inp.spellcheck = false;
+        inp.value = S.userInput.get(key) || '';
+        inp.addEventListener('mousedown', e => { e.preventDefault(); onCellClick(r, c); });
+        inp.addEventListener('touchstart', e => { e.preventDefault(); onCellClick(r, c); }, { passive: false });
+        inp.addEventListener('keydown', e => onKeyDown(e, r, c));
+        inp.addEventListener('input', e => onInput(e, r, c));
+        div.appendChild(inp);
+      }
+      grid.appendChild(div);
+    }
+  }
+  highlightSelection();
+}
+
+function getCell(r, c) {
+  return document.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+}
+
+function highlightSelection() {
+  document.querySelectorAll('.cell').forEach(el => el.classList.remove('active', 'word-active'));
+  if (!S.sel) return;
+  const { r, c } = S.sel;
+  const entries = S.wordMap.get(`${r},${c}`) || [];
+  const entry = entries.find(e => S.words[e.wordIdx].direction === S.dir) || entries[0];
+
+  if (entry) {
+    const w = S.words[entry.wordIdx];
+    for (let i = 0; i < w.word.length; i++) {
+      const wr = w.direction === 'H' ? w.row : w.row + i;
+      const wc = w.direction === 'H' ? w.col + i : w.col;
+      const el = getCell(wr, wc);
+      if (el) el.classList.add('word-active');
+    }
+    updateMobileClue(w);
+    highlightClue(entry.wordIdx);
+  }
+
+  const selEl = getCell(r, c);
+  if (selEl) { selEl.classList.remove('word-active'); selEl.classList.add('active'); }
+  focusCell(r, c);
+}
+
+function focusCell(r, c) {
+  const el = getCell(r, c);
+  if (el) { const inp = el.querySelector('input'); if (inp) inp.focus({ preventScroll: true }); }
+}
+
+// ─── Clue rendering ───────────────────────────────────────────────────────────
+function renderClues() {
+  const across = document.getElementById('clues-across');
+  const down   = document.getElementById('clues-down');
+  across.innerHTML = ''; down.innerHTML = '';
+
+  S.words.forEach((w, wi) => {
+    const div = document.createElement('div');
+    div.className = 'clue-row';
+    div.dataset.wi = wi;
+    div.innerHTML = `<span class="font-semibold text-slate-400">${w.num}.</span> ${w.clue}`;
+    div.addEventListener('click', () => selectWord(wi));
+    (w.direction === 'H' ? across : down).appendChild(div);
+  });
+}
+
+function highlightClue(wi) {
+  document.querySelectorAll('.clue-row').forEach(el => el.classList.remove('active-clue'));
+  const el = document.querySelector(`.clue-row[data-wi="${wi}"]`);
+  if (el) { el.classList.add('active-clue'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+}
+
+function selectWord(wi) {
+  const w = S.words[wi];
+  S.sel = { r: w.row, c: w.col };
+  S.dir = w.direction;
+  highlightSelection();
+}
+
+// ─── Mobile clue bar ──────────────────────────────────────────────────────────
+function updateMobileClue(w) {
+  document.getElementById('mobile-clue-label').textContent =
+    `${w.num}. ${w.direction === 'H' ? 'Horizontalement' : 'Verticalement'}`;
+  document.getElementById('mobile-clue-text').textContent = w.clue;
+  document.getElementById('mobile-clue-bar').classList.add('visible');
+}
+
+// ─── Cell interaction ─────────────────────────────────────────────────────────
+function onCellClick(r, c) {
+  const key = `${r},${c}`;
+  if (!S.gridMap.has(key) || S.done) return;
+
+  if (S.sel && S.sel.r === r && S.sel.c === c) {
+    const dirs = new Set((S.wordMap.get(key) || []).map(e => S.words[e.wordIdx].direction));
+    if (dirs.size > 1) S.dir = S.dir === 'H' ? 'V' : 'H';
+  } else {
+    S.sel = { r, c };
+    const entries = S.wordMap.get(key) || [];
+    if (entries.length && !entries.find(e => S.words[e.wordIdx].direction === S.dir))
+      S.dir = S.words[entries[0].wordIdx].direction;
+  }
+  highlightSelection();
+}
+
+function onKeyDown(e, r, c) {
+  if (S.done) return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); moveDir(r, c, 0, 1); return; }
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); moveDir(r, c, 0,-1); return; }
+  if (e.key === 'ArrowDown')  { e.preventDefault(); moveDir(r, c, 1, 0); return; }
+  if (e.key === 'ArrowUp')    { e.preventDefault(); moveDir(r, c,-1, 0); return; }
+  if (e.key === 'Tab') { e.preventDefault(); advanceWord(e.shiftKey ? -1 : 1); return; }
+  if (e.key === 'Backspace' || e.key === 'Delete') {
+    e.preventDefault();
+    const key = `${r},${c}`;
+    if (S.userInput.get(key)) {
+      S.userInput.delete(key);
+      const el = getCell(r, c);
+      if (el) { const inp = el.querySelector('input'); if (inp) inp.value = ''; }
+    } else {
+      S.dir === 'H' ? moveDir(r, c, 0,-1) : moveDir(r, c,-1, 0);
+    }
+    saveProgress();
+  }
+}
+
+function onInput(e, r, c) {
+  if (S.done) return;
+  const val = (e.target.value || '').toUpperCase().replace(/[^A-Z]/g, '');
+  e.target.value = val ? val[val.length - 1] : '';
+  const letter = e.target.value;
+  const key = `${r},${c}`;
+  if (letter) {
+    S.userInput.set(key, letter);
+    S.dir === 'H' ? moveDir(r, c, 0, 1) : moveDir(r, c, 1, 0);
+  } else {
+    S.userInput.delete(key);
+  }
+  saveProgress();
+}
+
+function moveDir(r, c, dr, dc) {
+  const { rows, cols } = S.gridSize;
+  let nr = r + dr, nc = c + dc;
+  while (nr >= 1 && nr <= rows && nc >= 1 && nc <= cols) {
+    if (S.gridMap.has(`${nr},${nc}`)) {
+      S.sel = { r: nr, c: nc };
+      if (dr === 0) S.dir = 'H'; else if (dc === 0) S.dir = 'V';
+      highlightSelection(); return;
+    }
+    nr += dr; nc += dc;
+  }
+}
+
+function advanceWord(delta) {
+  if (!S.sel) return;
+  const entries = S.wordMap.get(`${S.sel.r},${S.sel.c}`) || [];
+  const cur = entries.find(e => S.words[e.wordIdx].direction === S.dir) || entries[0];
+  if (!cur) return;
+  const next = ((cur.wordIdx + delta) % S.words.length + S.words.length) % S.words.length;
+  selectWord(next);
+}
+
+// ─── Verify ───────────────────────────────────────────────────────────────────
+function verify() {
+  if (S.done) return;
+  let errorWords = 0;
+  S.words.forEach(w => {
+    for (let i = 0; i < w.word.length; i++) {
+      const r = w.direction === 'H' ? w.row : w.row + i;
+      const c = w.direction === 'H' ? w.col + i : w.col;
+      if ((S.userInput.get(`${r},${c}`) || '') !== w.word[i]) { errorWords++; return; }
+    }
+  });
+
+  if (errorWords === 0) {
+    S.done = true; stopTimer(); saveProgress(); showModal();
+  } else {
+    S.tries++;
+    updateTriesDisplay();
+    saveProgress();
+    showToast(`La grille contient ${errorWords} mot${errorWords > 1 ? 's' : ''} incorrect${errorWords > 1 ? 's' : ''}.`);
+  }
+}
+
+function updateTriesDisplay() {
+  document.getElementById('tries-display').textContent =
+    S.tries === 0 ? 'Aucune erreur' : `${S.tries} essai${S.tries > 1 ? 's' : ''}`;
+}
+
+// ─── Timer ────────────────────────────────────────────────────────────────────
+function startTimer() {
+  if (S.timerID) return;
+  S.timerID = setInterval(() => { S.secs++; updateTimerDisplay(); }, 1000);
+}
+
+function stopTimer() { clearInterval(S.timerID); S.timerID = null; }
+
+function updateTimerDisplay() {
+  const m = String(Math.floor(S.secs / 60)).padStart(2, '0');
+  const s = String(S.secs % 60).padStart(2, '0');
+  document.getElementById('timer-display').textContent = `${m}:${s}`;
+}
+
+function formatTime(secs) {
+  const m = Math.floor(secs / 60), s = secs % 60;
+  return m === 0 ? `${s}s` : `${m}m${String(s).padStart(2,'0')}s`;
+}
+
+// ─── Share ────────────────────────────────────────────────────────────────────
+function share() {
+  const text = [
+    `\u{1F3CC}️ Mots Croisés — ${S.theme}`,
+    `\u{1F4C5} ${S.dateStr}`,
+    `⏱ ${formatTime(S.secs)}`,
+    `\u{1F3AF} ${S.tries === 0 ? 'Sans erreur !' : `${S.tries} essai${S.tries > 1 ? 's' : ''}`}`,
+    '',
+    'https://pabloortolan.github.io/vibeapp'
+  ].join('\n');
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('share-btn');
+    const txt = document.getElementById('share-btn-text');
+    btn.classList.add('btn-success');
+    txt.textContent = 'Copié !';
+    setTimeout(() => { btn.classList.remove('btn-success'); txt.textContent = 'Partager'; }, 3000);
+  }).catch(() => showToast('Impossible de copier.'));
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+let _toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+function showModal() {
+  document.getElementById('modal-time').textContent = `Temps : ${formatTime(S.secs)}`;
+  document.getElementById('modal-tries').textContent =
+    S.tries === 0 ? 'Résolu du premier coup !' : `${S.tries} essai${S.tries > 1 ? 's' : ''} avant la solution.`;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+function showDoneState() {
+  document.querySelectorAll('.cell:not(.black)').forEach(el => el.classList.add('correct'));
+}
+
+// ─── Persistence ──────────────────────────────────────────────────────────────
+function lsKey() { return `mots-croises-${S.dateStr}`; }
+
+function saveProgress() {
+  const inp = {};
+  S.userInput.forEach((v, k) => { inp[k] = v; });
+  localStorage.setItem(lsKey(), JSON.stringify({ inp, secs: S.secs, done: S.done, tries: S.tries }));
+}
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(lsKey());
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    return { inp: new Map(Object.entries(p.inp || {})), secs: p.secs || 0, done: !!p.done, tries: p.tries || 0 };
+  } catch(e) { return null; }
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+loadPuzzle();
 </script>
 </body>
 </html>
