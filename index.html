@@ -90,8 +90,13 @@ body {
 }
 .left-col { flex: 1; min-width: 0; }
 .right-col {
-  width: 280px;
+  width: 340px;
   flex-shrink: 0;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
 }
 
 /* ── SECTION LABELS (Le Monde style) ── */
@@ -171,6 +176,12 @@ body {
   color: #09090b;
 }
 .btn-verify:hover { background: #f5ead4; }
+.btn-erase {
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border2);
+}
+.btn-erase:hover { background: #1f1f23; color: var(--text); }
 .btn-share {
   background: var(--surface);
   color: var(--text);
@@ -348,6 +359,7 @@ body {
     </div>
     <div class="actions">
       <button class="btn btn-verify" onclick="verify()">Vérifier</button>
+      <button class="btn btn-erase" onclick="eraseAll()">Effacer</button>
       <button class="btn btn-share" id="share-btn" onclick="share()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         <span id="share-text">Partager</span>
@@ -548,7 +560,8 @@ function buildClues() {
   const ch = document.getElementById('clues-h');
   const cv = document.getElementById('clues-v');
   ch.innerHTML = ''; cv.innerHTML = '';
-  S.words.forEach((w, wi) => {
+  const sorted = S.words.map((w, wi) => ({ w, wi })).sort((a, b) => a.w.num - b.w.num);
+  sorted.forEach(({ w, wi }) => {
     const div = document.createElement('div');
     div.className = 'clue-item'; div.dataset.wi = wi;
     div.innerHTML = `<span class="clue-num">${w.num}.</span><span class="clue-text">${w.clue}</span>`;
@@ -592,6 +605,11 @@ function tap(r, c) {
 
 function kdown(e, r, c) {
   if (S.done) return;
+  // For printable letters: clear the cell first so `input` always fires, even if same letter
+  if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+    e.target.value = '';
+    return; // let keydown propagate so browser inserts the char, triggering input event
+  }
   if (e.key === 'ArrowRight') { e.preventDefault(); move(r, c, 0, 1); return; }
   if (e.key === 'ArrowLeft')  { e.preventDefault(); move(r, c, 0,-1); return; }
   if (e.key === 'ArrowDown')  { e.preventDefault(); move(r, c, 1, 0); return; }
@@ -613,11 +631,18 @@ function kdown(e, r, c) {
 function kinput(e, r, c) {
   if (S.done) return;
   const raw = (e.target.value || '').toUpperCase().replace(/[^A-Z]/g, '');
-  e.target.value = raw ? raw[raw.length - 1] : '';
-  const letter = e.target.value;
+  const letter = raw ? raw[raw.length - 1] : '';
+  e.target.value = letter;
   const k = key(r, c);
-  if (letter) { S.input.set(k, letter); S.dir === 'H' ? move(r, c, 0, 1) : move(r, c, 1, 0); }
-  else S.input.delete(k);
+  if (letter) {
+    S.input.set(k, letter);
+    // Update all inputs sharing this cell (intersection)
+    const el = document.querySelector(`[data-r="${r}"][data-c="${c}"] input`);
+    if (el) el.value = letter;
+    S.dir === 'H' ? move(r, c, 0, 1) : move(r, c, 1, 0);
+  } else {
+    S.input.delete(k);
+  }
   save();
 }
 
@@ -642,6 +667,13 @@ function nextWord(delta) {
 }
 
 // ── Verify ─────────────────────────────────────────────────────────────────
+function eraseAll() {
+  if (S.done) return;
+  S.input.clear();
+  document.querySelectorAll('.cell.white input').forEach(inp => { inp.value = ''; });
+  save();
+}
+
 function verify() {
   if (S.done) return;
   let bad = 0;
