@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,7 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Rose Pine Dawn (light) */
+/* ── LIGHT (Rose Pine Dawn) ── */
 :root {
   --bg:        #faf4ed;
   --surface:   #fffaf3;
@@ -20,12 +20,26 @@
   --muted:     #9893a5;
   --accent:    #b4637a;
   --blue:      #907aa9;
-  --emerald:   #286983;
-  --rose:      #d7827a;
   --cell-bg:   #fffaf3;
   --cell-hover:#f2e9e1;
   --cell-sel:  #e8d0da;
   --cell-word: #f2e4ea;
+}
+
+/* ── DARK (Rose Pine) ── */
+[data-theme="dark"] {
+  --bg:        #180b10;
+  --surface:   #22111a;
+  --border:    #3d1a2a;
+  --border2:   #5c2a3f;
+  --text:      #fdf2f4;
+  --muted:     #c07a94;
+  --accent:    #f9a8d4;
+  --blue:      #f472b6;
+  --cell-bg:   #2d1520;
+  --cell-hover:#3d1a28;
+  --cell-sel:  #7c1d48;
+  --cell-word: #4a1230;
 }
 
 body {
@@ -33,31 +47,26 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  transition: background 0.2s, color 0.2s;
 }
 
 /* ── MASTHEAD ── */
-.masthead {
-  padding: 18px 0 0;
-}
+.masthead { padding: 18px 0 14px; }
 .masthead-inner {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 16px 14px;
+  padding: 0 16px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  position: relative;
 }
-/* Single line that ends roughly at the right edge of the left (grid) column */
-.masthead-inner::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 16px;
-  width: calc(100% - 340px - 32px - 16px);
-  height: 1px;
-  background: var(--border2);
+/* Left block: title + subtitle + decorative line below */
+.masthead-left {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border2);
 }
 .masthead-title {
   font-family: 'Playfair Display', serif;
@@ -77,8 +86,9 @@ body {
 .masthead-meta {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   flex-shrink: 0;
+  padding-bottom: 2px;
 }
 .timer {
   font-variant-numeric: tabular-nums;
@@ -96,6 +106,19 @@ body {
   color: var(--muted);
   font-weight: 500;
 }
+.theme-btn {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  width: 32px; height: 32px;
+  border-radius: 4px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.theme-btn:hover { background: var(--cell-hover); }
 
 /* ── LAYOUT ── */
 .app {
@@ -147,6 +170,7 @@ body {
 .cell.white.word-active { background: var(--cell-word); }
 .cell.white.active { background: var(--cell-sel); }
 .cell.correct { background: #d8ead4 !important; }
+[data-theme="dark"] .cell.correct { background: #1a3a2a !important; }
 
 .cell input {
   position: absolute; inset: 0;
@@ -173,11 +197,7 @@ body {
 }
 
 /* ── ACTIONS ── */
-.actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-}
+.actions { display: flex; gap: 10px; margin-top: 16px; }
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 9px 18px;
@@ -188,55 +208,28 @@ body {
   transition: all 0.15s;
   letter-spacing: 0.3px;
 }
-.btn-verify {
-  background: var(--accent);
-  color: #faf4ed;
-}
-.btn-verify:hover { background: #c4738a; }
-.btn-erase {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border2);
-}
+.btn-verify { background: var(--accent); color: var(--bg); }
+.btn-verify:hover { filter: brightness(1.1); }
+.btn-erase { background: var(--surface); color: var(--text); border: 1px solid var(--border2); }
 .btn-erase:hover { background: var(--cell-hover); }
-.btn-share {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border2);
-}
+.btn-share { background: var(--surface); color: var(--text); border: 1px solid var(--border2); }
 .btn-share:hover { background: var(--cell-hover); }
-.btn-copied {
-  background: #286983 !important;
-  color: #faf4ed !important;
-  border-color: #286983 !important;
-}
+.btn-copied { background: #286983 !important; color: #faf4ed !important; border-color: #286983 !important; }
 
 /* ── CLUES ── */
 .clue-list { display: flex; flex-direction: column; }
 .clue-item {
-  display: flex;
-  gap: 8px;
+  display: flex; gap: 8px;
   padding: 7px 8px;
   border-radius: 3px;
   cursor: pointer;
   transition: background 0.1s;
   border-left: 2px solid transparent;
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 13px; line-height: 1.45;
 }
 .clue-item:hover { background: var(--cell-hover); }
-.clue-item.active {
-  background: var(--cell-word);
-  border-left-color: var(--accent);
-}
-.clue-num {
-  font-weight: 700;
-  color: var(--accent);
-  min-width: 22px;
-  flex-shrink: 0;
-  font-size: 12px;
-  padding-top: 1px;
-}
+.clue-item.active { background: var(--cell-word); border-left-color: var(--accent); }
+.clue-num { font-weight: 700; color: var(--accent); min-width: 22px; flex-shrink: 0; font-size: 12px; padding-top: 1px; }
 .clue-text { color: var(--text); }
 
 /* ── MOBILE CLUE BAR ── */
@@ -250,103 +243,53 @@ body {
   transition: transform 0.22s cubic-bezier(.4,0,.2,1);
 }
 #mobile-bar.open { transform: translateY(0); }
-.mobile-bar-dir {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--accent);
-  margin-bottom: 4px;
-}
-.mobile-bar-clue {
-  font-family: 'Playfair Display', serif;
-  font-size: 15px;
-  color: var(--text);
-  line-height: 1.4;
-}
+.mobile-bar-dir { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 4px; }
+.mobile-bar-clue { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--text); line-height: 1.4; }
 
 /* ── TOAST ── */
 #toast {
-  position: fixed;
-  bottom: 24px; left: 50%;
+  position: fixed; bottom: 24px; left: 50%;
   transform: translateX(-50%) translateY(8px);
-  background: #f9ece8;
-  color: #b4637a;
-  border: 1px solid #d7827a;
-  padding: 10px 18px;
-  border-radius: 3px;
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--border2);
+  padding: 10px 18px; border-radius: 3px;
   font-size: 13px; font-weight: 500;
-  opacity: 0;
-  transition: all 0.25s;
-  pointer-events: none;
-  z-index: 80;
-  white-space: nowrap;
+  opacity: 0; transition: all 0.25s;
+  pointer-events: none; z-index: 80; white-space: nowrap;
 }
-#toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── MODAL ── */
 #modal-overlay {
   position: fixed; inset: 0;
-  background: rgba(87,82,121,0.35);
+  background: rgba(0,0,0,0.45);
   display: flex; align-items: center; justify-content: center;
-  z-index: 100;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.25s;
+  z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.25s;
 }
 #modal-overlay.open { opacity: 1; pointer-events: all; }
 .modal {
   background: var(--surface);
   border: 1px solid var(--border2);
   border-top: 3px solid var(--accent);
-  border-radius: 4px;
-  padding: 36px 32px;
-  max-width: 380px; width: 90%;
-  text-align: center;
+  border-radius: 4px; padding: 36px 32px;
+  max-width: 380px; width: 90%; text-align: center;
 }
 .modal-icon { font-size: 40px; margin-bottom: 14px; }
-.modal-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 28px; font-weight: 900;
-  color: var(--accent);
-  margin-bottom: 6px;
-}
-.modal-stat {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
+.modal-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+.modal-stat { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
 .modal-actions { margin-top: 24px; display: flex; gap: 10px; justify-content: center; }
 .btn-modal-share {
-  background: var(--accent);
-  color: #faf4ed;
-  padding: 10px 24px;
-  border-radius: 3px;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  display: inline-flex; align-items: center; gap: 6px;
-  transition: all 0.15s;
+  background: var(--accent); color: var(--bg);
+  padding: 10px 24px; border-radius: 3px; font-weight: 700; font-size: 14px;
+  cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
 }
-.btn-modal-share:hover { background: #c4738a; }
-.btn-modal-close {
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border2);
-  padding: 10px 20px;
-  border-radius: 3px;
-  font-size: 13px; font-weight: 500;
-  cursor: pointer;
-}
+.btn-modal-share:hover { filter: brightness(1.1); }
+.btn-modal-close { background: transparent; color: var(--muted); border: 1px solid var(--border2); padding: 10px 20px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 700px) {
-  .masthead { padding: 14px 0 0; }
-  .masthead-inner { padding: 0 12px 12px; }
-  .masthead-inner::after { width: 55%; left: 12px; }
+  .masthead { padding: 14px 0 12px; }
   .app { padding: 14px 12px 40px; }
   .right-col { display: none; }
   #toast { bottom: 80px; }
@@ -359,23 +302,21 @@ body {
 </head>
 <body>
 
-<!-- Masthead -->
 <header class="masthead">
   <div class="masthead-inner">
-    <div>
+    <div class="masthead-left">
       <div class="masthead-title">Mots Croisés</div>
       <div class="masthead-sub" id="theme-sub">du Jour</div>
     </div>
     <div class="masthead-meta">
       <span class="timer" id="timer">00:00</span>
       <span class="tries-badge" id="tries-badge">0 essai</span>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Mode sombre / clair">🌙</button>
     </div>
   </div>
 </header>
 
-<!-- App body -->
 <div class="app">
-  <!-- Left: grid + buttons -->
   <div class="left-col">
     <div class="grid-scroll">
       <div id="grid" class="crossword-grid"></div>
@@ -390,7 +331,6 @@ body {
     </div>
   </div>
 
-  <!-- Right: clue lists (desktop) -->
   <div class="right-col">
     <div style="margin-bottom: 24px;">
       <div class="section-label">Horizontalement</div>
@@ -403,16 +343,13 @@ body {
   </div>
 </div>
 
-<!-- Mobile clue bar -->
 <div id="mobile-bar">
   <div class="mobile-bar-dir" id="mb-dir"></div>
   <div class="mobile-bar-clue" id="mb-clue"></div>
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
-<!-- Success modal -->
 <div id="modal-overlay">
   <div class="modal">
     <div class="modal-icon">🌸</div>
@@ -430,6 +367,24 @@ body {
 </div>
 
 <script>
+// ── Theme ──────────────────────────────────────────────────────────────────
+(function() {
+  const t = localStorage.getItem('mc-theme') || 'light';
+  document.documentElement.dataset.theme = t;
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('theme-btn');
+    if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+  });
+})();
+
+function toggleTheme() {
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('mc-theme', next);
+  document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
 // ── State ──────────────────────────────────────────────────────────────────
 const S = {
   dateStr: '', theme: '', isFallback: false,
@@ -449,10 +404,7 @@ function today() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-function fmtDate(s) {
-  const [y,m,d] = s.split('-');
-  return `${d}/${m}/${y}`;
-}
+function fmtDate(s) { const [y,m,d] = s.split('-'); return `${d}/${m}/${y}`; }
 function fmtTime(secs) {
   const m = String(Math.floor(secs/60)).padStart(2,'0');
   const s = String(secs%60).padStart(2,'0');
@@ -472,17 +424,48 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener('scroll', updateBarPosition);
 }
 
+// ── Error screen ───────────────────────────────────────────────────────────
+function showError(msg) {
+  document.body.innerHTML = `<div style="padding:3rem 2rem;font-family:Georgia,serif;color:#575279;max-width:480px;margin:0 auto;background:#faf4ed;min-height:100vh">
+    <div style="font-size:2rem;margin-bottom:1rem">⚠️</div>
+    <p style="font-size:1.1rem;font-weight:bold;color:#b4637a;margin-bottom:.5rem">Puzzle introuvable</p>
+    <p style="font-size:.9rem;color:#9893a5;margin-bottom:1rem">${msg}</p>
+    <button onclick="location.reload()" style="padding:10px 20px;background:#b4637a;color:#faf4ed;border:none;border-radius:3px;font-size:.9rem;cursor:pointer">Réessayer</button>
+  </div>`;
+}
+
 // ── Load ───────────────────────────────────────────────────────────────────
 async function boot() {
   S.dateStr = today();
   let data = null;
-  try { const r = await fetch(`data/${S.dateStr}.json`); if (r.ok) data = await r.json(); } catch(e) {}
+
+  try {
+    const r = await fetch(`./data/${S.dateStr}.json`);
+    if (r.ok) data = await r.json();
+  } catch(e) { console.warn('No daily puzzle:', e); }
+
   if (!data) {
     S.isFallback = true;
-    try { const r = await fetch('data/golf-fallback.json'); if (r.ok) data = await r.json(); } catch(e) {}
+    try {
+      const r = await fetch('./data/golf-fallback.json');
+      if (r.ok) {
+        data = await r.json();
+      } else {
+        console.error('Fallback fetch failed, status:', r.status);
+      }
+    } catch(e) {
+      console.error('Fallback fetch error:', e);
+    }
   }
-  if (!data) { showError('Impossible de charger le puzzle. Vérifiez votre connexion et rechargez la page.'); return; }
-  try { init(data); } catch(e) { showError(`Erreur lors du chargement : ${e.message}`); }
+
+  if (!data) {
+    showError('Impossible de charger le puzzle. Vérifiez votre connexion et rechargez la page.');
+    return;
+  }
+  try { init(data); } catch(e) {
+    console.error('Init error:', e);
+    showError(`Erreur lors du chargement : ${e.message}`);
+  }
 }
 
 function init(data) {
@@ -510,7 +493,6 @@ function init(data) {
     }
   });
 
-  // Assign clue numbers
   const seen = new Map(); let n = 1;
   S.words.map((w, wi) => ({ r: w.row, c: w.col, wi }))
     .sort((a, b) => a.r !== b.r ? a.r - b.r : a.c - b.c)
@@ -646,10 +628,7 @@ function tap(r, c) {
 
 function kdown(e, r, c) {
   if (S.done) return;
-  if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
-    e.target.value = '';
-    return;
-  }
+  if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) { e.target.value = ''; return; }
   if (e.key === 'ArrowRight') { e.preventDefault(); move(r, c, 0, 1); return; }
   if (e.key === 'ArrowLeft')  { e.preventDefault(); move(r, c, 0,-1); return; }
   if (e.key === 'ArrowDown')  { e.preventDefault(); move(r, c, 1, 0); return; }
@@ -705,7 +684,7 @@ function nextWord(delta) {
   selectWord(((cur.wi + delta) % S.words.length + S.words.length) % S.words.length);
 }
 
-// ── Verify ─────────────────────────────────────────────────────────────────
+// ── Verify / Erase ─────────────────────────────────────────────────────────
 function eraseAll() {
   if (S.done) return;
   S.input.clear();
@@ -725,18 +704,13 @@ function verify() {
   });
   if (bad === 0) { S.done = true; stopTimer(); save(); openModal(); }
   else {
-    S.tries++;
-    updateTries();
-    save();
+    S.tries++; updateTries(); save();
     toast(`La grille contient ${bad} mot${bad > 1 ? 's' : ''} incorrect${bad > 1 ? 's' : ''}.`);
   }
 }
 
 // ── Timer ──────────────────────────────────────────────────────────────────
-function startTimer() {
-  if (S.tid) return;
-  S.tid = setInterval(() => { S.secs++; updateTimer(); }, 1000);
-}
+function startTimer() { if (S.tid) return; S.tid = setInterval(() => { S.secs++; updateTimer(); }, 1000); }
 function stopTimer() { clearInterval(S.tid); S.tid = null; }
 function updateTimer() { document.getElementById('timer').textContent = fmtTime(S.secs); }
 function updateTries() {
@@ -754,20 +728,17 @@ function shareText() {
     `https://pabloortolan.github.io/vibeapp`
   ].join('\n');
 }
-
 function animateShareBtn(btnEl, textEl) {
   btnEl.classList.add('btn-copied');
   const orig = textEl.textContent;
   textEl.textContent = 'Copié !';
   setTimeout(() => { btnEl.classList.remove('btn-copied'); textEl.textContent = orig; }, 3000);
 }
-
 function share() {
   navigator.clipboard.writeText(shareText()).then(() => {
     animateShareBtn(document.getElementById('share-btn'), document.getElementById('share-text'));
   }).catch(() => toast('Impossible de copier.'));
 }
-
 function modalShare() {
   navigator.clipboard.writeText(shareText()).then(() => {
     animateShareBtn(document.getElementById('modal-share-btn'), document.getElementById('modal-share-text'));
@@ -790,9 +761,7 @@ function openModal() {
   document.getElementById('modal-overlay').classList.add('open');
 }
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
-function markDone() {
-  document.querySelectorAll('.cell.white').forEach(el => el.classList.add('correct'));
-}
+function markDone() { document.querySelectorAll('.cell.white').forEach(el => el.classList.add('correct')); }
 
 // ── Persistence ────────────────────────────────────────────────────────────
 function lsKey() { return `mc-${S.dateStr}`; }
@@ -808,15 +777,6 @@ function loadSave() {
     const p = JSON.parse(raw);
     return { inp: new Map(Object.entries(p.inp || {})), secs: p.secs || 0, done: !!p.done, tries: p.tries || 0 };
   } catch(e) { return null; }
-}
-
-function showError(msg) {
-  document.body.innerHTML = `<div style="padding:3rem 2rem;font-family:Georgia,serif;color:#575279;max-width:480px;margin:0 auto">
-    <div style="font-size:2rem;margin-bottom:1rem">⚠️</div>
-    <p style="font-size:1.1rem;font-weight:bold;color:#b4637a;margin-bottom:.5rem">Puzzle introuvable</p>
-    <p style="font-size:.9rem;color:#9893a5">${msg}</p>
-    <button onclick="location.reload()" style="margin-top:1.5rem;padding:10px 20px;background:#b4637a;color:#faf4ed;border:none;border-radius:3px;font-size:.9rem;cursor:pointer">Réessayer</button>
-  </div>`;
 }
 
 boot();
