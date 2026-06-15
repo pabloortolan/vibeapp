@@ -10,21 +10,22 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Rose Pine Dawn (light) */
 :root {
-  --bg:        #180b10;
-  --surface:   #22111a;
-  --border:    #3d1a2a;
-  --border2:   #5c2a3f;
-  --text:      #fdf2f4;
-  --muted:     #c07a94;
-  --accent:    #f9a8d4;
-  --blue:      #f472b6;
-  --emerald:   #10b981;
-  --rose:      #fb7185;
-  --cell-bg:   #2d1520;
-  --cell-hover:#3d1a28;
-  --cell-sel:  #7c1d48;
-  --cell-word: #4a1230;
+  --bg:        #faf4ed;
+  --surface:   #fffaf3;
+  --border:    #ddd8cf;
+  --border2:   #c8c3ba;
+  --text:      #575279;
+  --muted:     #9893a5;
+  --accent:    #b4637a;
+  --blue:      #907aa9;
+  --emerald:   #286983;
+  --rose:      #d7827a;
+  --cell-bg:   #fffaf3;
+  --cell-hover:#f2e9e1;
+  --cell-sel:  #e8d0da;
+  --cell-word: #f2e4ea;
 }
 
 body {
@@ -36,17 +37,27 @@ body {
 
 /* ── MASTHEAD ── */
 .masthead {
-  border-bottom: 3px double var(--border2);
-  padding: 18px 0 14px;
+  padding: 18px 0 0;
 }
 .masthead-inner {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 16px 14px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
+  position: relative;
+}
+/* Single line that ends roughly at the right edge of the left (grid) column */
+.masthead-inner::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  width: calc(100% - 340px - 32px - 16px);
+  height: 1px;
+  background: var(--border2);
 }
 .masthead-title {
   font-family: 'Playfair Display', serif;
@@ -123,8 +134,8 @@ body {
 .crossword-grid {
   display: inline-grid;
   gap: 2px;
-  background: var(--bg);
-  padding: 2px;
+  background: var(--border);
+  padding: 0;
 }
 .cell {
   width: 38px; height: 38px;
@@ -132,10 +143,10 @@ body {
   position: relative;
 }
 .cell.white { background: var(--cell-bg); }
-.cell.white:hover { background: var(--cell-hover); }
+.cell.white:hover { background: var(--cell-hover); cursor: pointer; }
 .cell.white.word-active { background: var(--cell-word); }
 .cell.white.active { background: var(--cell-sel); }
-.cell.correct { background: #1a3a2a !important; }
+.cell.correct { background: #d8ead4 !important; }
 
 .cell input {
   position: absolute; inset: 0;
@@ -179,25 +190,25 @@ body {
 }
 .btn-verify {
   background: var(--accent);
-  color: #180b10;
+  color: #faf4ed;
 }
-.btn-verify:hover { background: #fbc8e0; }
+.btn-verify:hover { background: #c4738a; }
 .btn-erase {
   background: var(--surface);
-  color: var(--muted);
+  color: var(--text);
   border: 1px solid var(--border2);
 }
-.btn-erase:hover { background: #3d1a2a; color: var(--text); }
+.btn-erase:hover { background: var(--cell-hover); }
 .btn-share {
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border2);
 }
-.btn-share:hover { background: #3d1a2a; }
+.btn-share:hover { background: var(--cell-hover); }
 .btn-copied {
-  background: #064e3b !important;
-  color: #6ee7b7 !important;
-  border-color: #065f46 !important;
+  background: #286983 !important;
+  color: #faf4ed !important;
+  border-color: #286983 !important;
 }
 
 /* ── CLUES ── */
@@ -213,27 +224,27 @@ body {
   font-size: 13px;
   line-height: 1.45;
 }
-.clue-item:hover { background: #3d1a2a; }
+.clue-item:hover { background: var(--cell-hover); }
 .clue-item.active {
-  background: #4a1230;
-  border-left-color: var(--blue);
+  background: var(--cell-word);
+  border-left-color: var(--accent);
 }
 .clue-num {
   font-weight: 700;
-  color: var(--muted);
+  color: var(--accent);
   min-width: 22px;
   flex-shrink: 0;
   font-size: 12px;
   padding-top: 1px;
 }
-.clue-text { color: #f3d0e0; }
+.clue-text { color: var(--text); }
 
 /* ── MOBILE CLUE BAR ── */
 #mobile-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: #22111a;
-  border-top: 2px solid var(--border2);
-  padding: 12px 16px 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border2);
+  padding: 12px 12px 16px;
   z-index: 60;
   transform: translateY(100%);
   transition: transform 0.22s cubic-bezier(.4,0,.2,1);
@@ -244,13 +255,13 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: var(--blue);
+  color: var(--accent);
   margin-bottom: 4px;
 }
 .mobile-bar-clue {
   font-family: 'Playfair Display', serif;
   font-size: 15px;
-  color: var(--accent);
+  color: var(--text);
   line-height: 1.4;
 }
 
@@ -259,9 +270,9 @@ body {
   position: fixed;
   bottom: 24px; left: 50%;
   transform: translateX(-50%) translateY(8px);
-  background: #2d0a14;
-  color: #fda4af;
-  border: 1px solid #881337;
+  background: #f9ece8;
+  color: #b4637a;
+  border: 1px solid #d7827a;
   padding: 10px 18px;
   border-radius: 3px;
   font-size: 13px; font-weight: 500;
@@ -279,7 +290,7 @@ body {
 /* ── MODAL ── */
 #modal-overlay {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.75);
+  background: rgba(87,82,121,0.35);
   display: flex; align-items: center; justify-content: center;
   z-index: 100;
   opacity: 0; pointer-events: none;
@@ -310,7 +321,7 @@ body {
 .modal-actions { margin-top: 24px; display: flex; gap: 10px; justify-content: center; }
 .btn-modal-share {
   background: var(--accent);
-  color: #180b10;
+  color: #faf4ed;
   padding: 10px 24px;
   border-radius: 3px;
   font-weight: 700;
@@ -320,7 +331,7 @@ body {
   display: inline-flex; align-items: center; gap: 6px;
   transition: all 0.15s;
 }
-.btn-modal-share:hover { background: #fbc8e0; }
+.btn-modal-share:hover { background: #c4738a; }
 .btn-modal-close {
   background: transparent;
   color: var(--muted);
@@ -333,14 +344,14 @@ body {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 700px) {
-  .masthead { padding: 14px 0 12px; }
-  .masthead-inner { padding: 0 12px; }
+  .masthead { padding: 14px 0 0; }
+  .masthead-inner { padding: 0 12px 12px; }
+  .masthead-inner::after { width: 55%; left: 12px; }
   .app { padding: 14px 12px 40px; }
   .right-col { display: none; }
   #toast { bottom: 80px; }
   .cell { width: 30px; height: 30px; }
   .cell input { font-size: 13px; }
-  /* Move action buttons above the grid so clue bar never covers them */
   .left-col { display: flex; flex-direction: column; }
   .actions { order: -1; margin-top: 0; margin-bottom: 12px; }
 }
@@ -421,12 +432,12 @@ body {
 <script>
 // ── State ──────────────────────────────────────────────────────────────────
 const S = {
-  dateStr: '', theme: '',
+  dateStr: '', theme: '', isFallback: false,
   rows: 0, cols: 0,
   words: [],
-  grid: new Map(),    // "r,c" -> correct letter
-  nums: new Map(),    // "r,c" -> clue number
-  wmap: new Map(),    // "r,c" -> [{wi, pos}]
+  grid: new Map(),
+  nums: new Map(),
+  wmap: new Map(),
   input: new Map(),
   sel: null, dir: 'H',
   secs: 0, tid: null, done: false, tries: 0
@@ -467,9 +478,10 @@ async function boot() {
   let data = null;
   try { const r = await fetch(`data/${S.dateStr}.json`); if (r.ok) data = await r.json(); } catch(e) {}
   if (!data) {
+    S.isFallback = true;
     try { const r = await fetch('data/golf-fallback.json'); if (r.ok) data = await r.json(); } catch(e) {}
   }
-  if (!data) { document.body.innerHTML = '<p style="padding:2rem;color:#fb7185">Impossible de charger le puzzle.</p>'; return; }
+  if (!data) { document.body.innerHTML = '<p style="padding:2rem;color:#b4637a">Impossible de charger le puzzle.</p>'; return; }
   init(data);
 }
 
@@ -480,7 +492,11 @@ function init(data) {
   S.words = data.words.map(w => ({ ...w, word: w.word.toUpperCase() }));
 
   const sub = document.getElementById('theme-sub');
-  sub.textContent = S.theme ? `Thème : ${S.theme}` : 'du Jour';
+  if (!S.isFallback) {
+    sub.textContent = S.theme ? `${fmtDate(S.dateStr)} · ${S.theme}` : fmtDate(S.dateStr);
+  } else {
+    sub.textContent = S.theme ? `Thème : ${S.theme}` : 'du Jour';
+  }
 
   S.grid.clear(); S.nums.clear(); S.wmap.clear();
   S.words.forEach((w, wi) => {
@@ -630,7 +646,6 @@ function tap(r, c) {
 
 function kdown(e, r, c) {
   if (S.done) return;
-  // Clear cell first so `input` always fires, even if same letter typed twice
   if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
     e.target.value = '';
     return;
