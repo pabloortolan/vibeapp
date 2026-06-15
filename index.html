@@ -430,7 +430,6 @@ body {
 </div>
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
 const S = {
   dateStr: '', theme: '', isFallback: false,
   rows: 0, cols: 0,
@@ -443,7 +442,6 @@ const S = {
   secs: 0, tid: null, done: false, tries: 0
 };
 
-// ── Utilities ──────────────────────────────────────────────────────────────
 function key(r, c) { return `${r},${c}`; }
 function today() {
   const d = new Date();
@@ -460,7 +458,6 @@ function fmtTime(secs) {
 }
 function cellEl(r, c) { return document.querySelector(`[data-r="${r}"][data-c="${c}"]`); }
 
-// ── Mobile bar keyboard avoidance ──────────────────────────────────────────
 function updateBarPosition() {
   if (!window.visualViewport) return;
   const bar = document.getElementById('mobile-bar');
@@ -472,7 +469,15 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener('scroll', updateBarPosition);
 }
 
-// ── Load ───────────────────────────────────────────────────────────────────
+function showError(msg) {
+  document.body.innerHTML = `<div style="padding:3rem 2rem;font-family:Georgia,serif;color:#575279;max-width:480px;margin:0 auto">
+    <div style="font-size:2rem;margin-bottom:1rem">⚠️</div>
+    <p style="font-size:1.1rem;font-weight:bold;color:#b4637a;margin-bottom:.5rem">Puzzle introuvable</p>
+    <p style="font-size:.9rem;color:#9893a5">${msg}</p>
+    <button onclick="location.reload()" style="margin-top:1.5rem;padding:10px 20px;background:#b4637a;color:#faf4ed;border:none;border-radius:3px;font-size:.9rem;cursor:pointer">Réessayer</button>
+  </div>`;
+}
+
 async function boot() {
   S.dateStr = today();
   let data = null;
@@ -510,7 +515,6 @@ function init(data) {
     }
   });
 
-  // Assign clue numbers
   const seen = new Map(); let n = 1;
   S.words.map((w, wi) => ({ r: w.row, c: w.col, wi }))
     .sort((a, b) => a.r !== b.r ? a.r - b.r : a.c - b.c)
@@ -533,7 +537,6 @@ function init(data) {
   if (!S.done) startTimer(); else markDone();
 }
 
-// ── Grid ───────────────────────────────────────────────────────────────────
 function buildGrid() {
   const el = document.getElementById('grid');
   el.style.gridTemplateColumns = `repeat(${S.cols}, auto)`;
@@ -595,7 +598,6 @@ function focusCell(r, c) {
   if (el) { const inp = el.querySelector('input'); if (inp) inp.focus({ preventScroll: true }); }
 }
 
-// ── Clues ──────────────────────────────────────────────────────────────────
 function buildClues() {
   const ch = document.getElementById('clues-h');
   const cv = document.getElementById('clues-v');
@@ -620,7 +622,6 @@ function selectWord(wi) {
   const w = S.words[wi]; S.sel = { r: w.row, c: w.col }; S.dir = w.direction; highlight();
 }
 
-// ── Mobile clue ────────────────────────────────────────────────────────────
 function showMobileClue(w) {
   document.getElementById('mb-dir').textContent =
     `${w.num}. ${w.direction === 'H' ? 'Horizontalement' : 'Verticalement'}`;
@@ -629,7 +630,6 @@ function showMobileClue(w) {
   updateBarPosition();
 }
 
-// ── Cell events ────────────────────────────────────────────────────────────
 function tap(r, c) {
   if (!S.grid.has(key(r, c)) || S.done) return;
   if (S.sel?.r === r && S.sel?.c === c) {
@@ -705,7 +705,6 @@ function nextWord(delta) {
   selectWord(((cur.wi + delta) % S.words.length + S.words.length) % S.words.length);
 }
 
-// ── Verify ─────────────────────────────────────────────────────────────────
 function eraseAll() {
   if (S.done) return;
   S.input.clear();
@@ -732,7 +731,6 @@ function verify() {
   }
 }
 
-// ── Timer ──────────────────────────────────────────────────────────────────
 function startTimer() {
   if (S.tid) return;
   S.tid = setInterval(() => { S.secs++; updateTimer(); }, 1000);
@@ -744,13 +742,12 @@ function updateTries() {
   el.textContent = S.tries === 0 ? '0 essai' : `${S.tries} essai${S.tries > 1 ? 's' : ''}`;
 }
 
-// ── Share ──────────────────────────────────────────────────────────────────
 function shareText() {
   return [
     `Mots Croisés du Jour 🧩`,
-    `Date : ${fmtDate(S.dateStr)}`,
-    `Temps : ${fmtTime(S.secs)} ⏱️`,
-    `Tries : ${S.tries}`,
+    `Date : ${fmtDate(S.dateStr)}`,
+    `Temps : ${fmtTime(S.secs)} ⏱️`,
+    `Tries : ${S.tries}`,
     `https://pabloortolan.github.io/vibeapp`
   ].join('\n');
 }
@@ -758,7 +755,7 @@ function shareText() {
 function animateShareBtn(btnEl, textEl) {
   btnEl.classList.add('btn-copied');
   const orig = textEl.textContent;
-  textEl.textContent = 'Copié !';
+  textEl.textContent = 'Copié !';
   setTimeout(() => { btnEl.classList.remove('btn-copied'); textEl.textContent = orig; }, 3000);
 }
 
@@ -774,7 +771,6 @@ function modalShare() {
   }).catch(() => toast('Impossible de copier.'));
 }
 
-// ── Toast ──────────────────────────────────────────────────────────────────
 let _tt;
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -782,11 +778,10 @@ function toast(msg) {
   clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove('show'), 3500);
 }
 
-// ── Modal ──────────────────────────────────────────────────────────────────
 function openModal() {
-  document.getElementById('m-time').textContent = `Temps : ${fmtTime(S.secs)}`;
+  document.getElementById('m-time').textContent = `Temps : ${fmtTime(S.secs)}`;
   document.getElementById('m-tries').textContent =
-    S.tries === 0 ? 'Résolu du premier coup !' : `${S.tries} essai${S.tries > 1 ? 's' : ''} avant la solution`;
+    S.tries === 0 ? 'Résolu du premier coup !' : `${S.tries} essai${S.tries > 1 ? 's' : ''} avant la solution`;
   document.getElementById('modal-overlay').classList.add('open');
 }
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
@@ -794,7 +789,6 @@ function markDone() {
   document.querySelectorAll('.cell.white').forEach(el => el.classList.add('correct'));
 }
 
-// ── Persistence ────────────────────────────────────────────────────────────
 function lsKey() { return `mc-${S.dateStr}`; }
 function save() {
   const inp = {};
@@ -820,6 +814,6 @@ function showError(msg) {
 }
 
 boot();
-</script>
+<\/script>
 </body>
 </html>
