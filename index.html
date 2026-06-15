@@ -134,12 +134,12 @@ body {
 .crossword-grid {
   display: inline-grid;
   gap: 2px;
-  background: var(--border);
-  padding: 0;
+  background: var(--border2);
+  padding: 2px;
 }
 .cell {
   width: 38px; height: 38px;
-  background: var(--bg);
+  background: var(--border2);
   position: relative;
 }
 .cell.white { background: var(--cell-bg); }
@@ -481,8 +481,8 @@ async function boot() {
     S.isFallback = true;
     try { const r = await fetch('data/golf-fallback.json'); if (r.ok) data = await r.json(); } catch(e) {}
   }
-  if (!data) { document.body.innerHTML = '<p style="padding:2rem;color:#b4637a">Impossible de charger le puzzle.</p>'; return; }
-  init(data);
+  if (!data) { showError('Impossible de charger le puzzle. Vérifiez votre connexion et rechargez la page.'); return; }
+  try { init(data); } catch(e) { showError(`Erreur lors du chargement : ${e.message}`); }
 }
 
 function init(data) {
@@ -808,6 +808,15 @@ function loadSave() {
     const p = JSON.parse(raw);
     return { inp: new Map(Object.entries(p.inp || {})), secs: p.secs || 0, done: !!p.done, tries: p.tries || 0 };
   } catch(e) { return null; }
+}
+
+function showError(msg) {
+  document.body.innerHTML = `<div style="padding:3rem 2rem;font-family:Georgia,serif;color:#575279;max-width:480px;margin:0 auto">
+    <div style="font-size:2rem;margin-bottom:1rem">⚠️</div>
+    <p style="font-size:1.1rem;font-weight:bold;color:#b4637a;margin-bottom:.5rem">Puzzle introuvable</p>
+    <p style="font-size:.9rem;color:#9893a5">${msg}</p>
+    <button onclick="location.reload()" style="margin-top:1.5rem;padding:10px 20px;background:#b4637a;color:#faf4ed;border:none;border-radius:3px;font-size:.9rem;cursor:pointer">Réessayer</button>
+  </div>`;
 }
 
 boot();
