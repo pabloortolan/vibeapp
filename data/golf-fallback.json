@@ -1,18 +1,114 @@
 {
   "theme": "Le Golf",
-  "gridSize": { "rows": 14, "cols": 12 },
+  "gridSize": {
+    "rows": 15,
+    "cols": 12
+  },
   "words": [
-    { "word": "GREEN",   "clue": "Zone de gazon tondu ras où se trouve le trou.", "direction": "V", "row": 1,  "col": 1  },
-    { "word": "BOGEY",   "clue": "Score d'un coup au-dessus du par.", "direction": "V", "row": 1,  "col": 3  },
-    { "word": "CHIP",    "clue": "Petit coup d'approche lobé vers le green.", "direction": "H", "row": 1,  "col": 5  },
-    { "word": "PAR",     "clue": "Nombre de coups idéal fixé pour un trou.", "direction": "V", "row": 1,  "col": 12 },
-    { "word": "EAGLE",   "clue": "Score de deux coups en dessous du par.", "direction": "H", "row": 3,  "col": 1  },
-    { "word": "BIRDIE",  "clue": "Score d'un coup en dessous du par.", "direction": "V", "row": 3,  "col": 10 },
-    { "word": "DRIVER",  "clue": "Club utilisé pour les longs coups de départ.", "direction": "H", "row": 5,  "col": 5  },
-    { "word": "BUNKER",  "clue": "Obstacle de sable redoutable sur le parcours.", "direction": "H", "row": 7,  "col": 1  },
-    { "word": "PUTTER",  "clue": "Club utilisé pour rouler la balle sur le green.", "direction": "H", "row": 10, "col": 5  },
-    { "word": "PUTT",    "clue": "Coup roulé sur le green vers le trou.", "direction": "V", "row": 11, "col": 3  },
-    { "word": "ROUGH",   "clue": "Zone d'herbe longue en bordure du fairway.", "direction": "H", "row": 12, "col": 1  },
-    { "word": "FAIRWAY", "clue": "Couloir de jeu tondu entre le départ et le green.", "direction": "H", "row": 14, "col": 5  }
+    {
+      "word": "CADDIE",
+      "clue": "Porteur de clubs qui conseille le joueur sur le parcours.",
+      "direction": "V",
+      "row": 10,
+      "col": 7
+    },
+    {
+      "word": "SWING",
+      "clue": "Mouvement fluide et balancé pour frapper la balle.",
+      "direction": "V",
+      "row": 5,
+      "col": 10
+    },
+    {
+      "word": "GREEN",
+      "clue": "Zone de gazon tondu ras où se trouve le trou.",
+      "direction": "H",
+      "row": 4,
+      "col": 4
+    },
+    {
+      "word": "CHIP",
+      "clue": "Petit coup d'approche lobé vers le green.",
+      "direction": "V",
+      "row": 12,
+      "col": 3
+    },
+    {
+      "word": "BOGEY",
+      "clue": "Score d'un coup au-dessus du par.",
+      "direction": "H",
+      "row": 9,
+      "col": 8
+    },
+    {
+      "word": "PUTTER",
+      "clue": "Club utilisé pour rouler la balle sur le green.",
+      "direction": "H",
+      "row": 15,
+      "col": 3
+    },
+    {
+      "word": "ROUGH",
+      "clue": "Zone d'herbe longue en bordure du fairway.",
+      "direction": "V",
+      "row": 1,
+      "col": 4
+    },
+    {
+      "word": "FAIRWAY",
+      "clue": "Couloir de jeu tondu entre le départ et le green.",
+      "direction": "H",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "word": "PUTT",
+      "clue": "Coup roulé sur le green vers le trou.",
+      "direction": "V",
+      "row": 12,
+      "col": 5
+    },
+    {
+      "word": "BIRDIE",
+      "clue": "Score d'un coup en dessous du par.",
+      "direction": "H",
+      "row": 7,
+      "col": 6
+    },
+    {
+      "word": "DRIVER",
+      "clue": "Club utilisé pour les longs coups de départ.",
+      "direction": "H",
+      "row": 13,
+      "col": 7
+    },
+    {
+      "word": "EAGLE",
+      "clue": "Score de deux coups en dessous du par.",
+      "direction": "V",
+      "row": 9,
+      "col": 11
+    },
+    {
+      "word": "BUNKER",
+      "clue": "Obstacle de sable redoutable sur le parcours.",
+      "direction": "V",
+      "row": 2,
+      "col": 8
+    },
+    {
+      "word": "TROU",
+      "clue": "Objectif final de chaque hole, marqué d'un drapeau.",
+      "direction": "H",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "word": "PAR",
+      "clue": "Nombre de coups idéal fixé pour un trou.",
+      "direction": "H",
+      "row": 11,
+      "col": 6
+    }
   ]
 }
