@@ -63,12 +63,14 @@ body {
   justify-content: space-between;
   gap: 16px;
 }
-/* Left block: title + subtitle + decorative line below */
+/* Masthead: full-width line under title + meta row */
+.masthead-inner {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border2);
+}
 .masthead-left {
   flex: 1;
   min-width: 0;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border2);
 }
 .masthead-title {
   font-family: var(--font);
@@ -78,19 +80,11 @@ body {
   color: var(--accent);
   line-height: 1;
 }
-.masthead-sub {
-  font-family: var(--font);
-  font-style: italic;
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 4px;
-}
 .masthead-meta {
   display: flex;
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-  padding-bottom: 2px;
 }
 .timer {
   font-variant-numeric: tabular-nums;
@@ -158,14 +152,15 @@ body {
 .grid-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .crossword-grid {
   display: inline-grid;
-  gap: 2px;
-  background: var(--border2);
-  padding: 2px;
+  gap: 3px;
+  background: transparent;
+  padding: 0;
 }
 .cell {
   width: 38px; height: 38px;
-  background: var(--border2);
+  background: transparent;
   position: relative;
+  border-radius: 2px;
 }
 .cell.white { background: var(--cell-bg); }
 .cell.white:hover { background: var(--cell-hover); cursor: pointer; }
@@ -236,6 +231,7 @@ body {
 
 /* ── MOBILE CLUE BAR ── */
 #mobile-bar {
+  display: none; /* shown only on mobile via media query */
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--surface);
   border-top: 1px solid var(--border2);
@@ -295,6 +291,7 @@ body {
   .app { padding: 14px 12px 40px; }
   .right-col { display: none; }
   #toast { bottom: 80px; }
+  #mobile-bar { display: block; }
   .cell { width: 30px; height: 30px; }
   .cell input { font-size: 13px; }
   .left-col { display: flex; flex-direction: column; }
@@ -308,7 +305,6 @@ body {
   <div class="masthead-inner">
     <div class="masthead-left">
       <div class="masthead-title">Mots Croisés</div>
-      <div class="masthead-sub" id="theme-sub">du Jour</div>
     </div>
     <div class="masthead-meta">
       <span class="timer" id="timer">00:00</span>
@@ -475,13 +471,6 @@ function init(data) {
   S.rows = data.gridSize.rows;
   S.cols = data.gridSize.cols;
   S.words = data.words.map(w => ({ ...w, word: w.word.toUpperCase() }));
-
-  const sub = document.getElementById('theme-sub');
-  if (!S.isFallback) {
-    sub.textContent = S.theme ? `${fmtDate(S.dateStr)} · ${S.theme}` : fmtDate(S.dateStr);
-  } else {
-    sub.textContent = S.theme ? `Thème : ${S.theme}` : 'du Jour';
-  }
 
   S.grid.clear(); S.nums.clear(); S.wmap.clear();
   S.words.forEach((w, wi) => {
