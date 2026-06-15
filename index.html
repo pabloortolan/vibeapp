@@ -11,19 +11,20 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:       #09090b;
-  --surface:  #111113;
-  --border:   #27272a;
-  --border2:  #3f3f46;
-  --text:     #fafafa;
-  --muted:    #a1a1aa;
-  --accent:   #e4d9c3;
-  --blue:     #3b82f6;
-  --emerald:  #10b981;
-  --rose:     #f43f5e;
-  --cell-bg:  #18181b;
-  --cell-sel: #1e3a5f;
-  --cell-word:#162032;
+  --bg:        #180b10;
+  --surface:   #22111a;
+  --border:    #3d1a2a;
+  --border2:   #5c2a3f;
+  --text:      #fdf2f4;
+  --muted:     #c07a94;
+  --accent:    #f9a8d4;
+  --blue:      #f472b6;
+  --emerald:   #10b981;
+  --rose:      #fb7185;
+  --cell-bg:   #2d1520;
+  --cell-hover:#3d1a28;
+  --cell-sel:  #7c1d48;
+  --cell-word: #4a1230;
 }
 
 body {
@@ -36,7 +37,12 @@ body {
 /* ── MASTHEAD ── */
 .masthead {
   border-bottom: 3px double var(--border2);
-  padding: 18px 24px 14px;
+  padding: 18px 0 14px;
+}
+.masthead-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 16px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -99,7 +105,7 @@ body {
   align-self: flex-start;
 }
 
-/* ── SECTION LABELS (Le Monde style) ── */
+/* ── SECTION LABELS ── */
 .section-label {
   font-family: 'Playfair Display', serif;
   font-size: 13px;
@@ -119,7 +125,6 @@ body {
   gap: 2px;
   background: var(--bg);
   padding: 2px;
-  border: 1px solid var(--border2);
 }
 .cell {
   width: 38px; height: 38px;
@@ -127,9 +132,10 @@ body {
   position: relative;
 }
 .cell.white { background: var(--cell-bg); }
+.cell.white:hover { background: var(--cell-hover); }
 .cell.white.word-active { background: var(--cell-word); }
 .cell.white.active { background: var(--cell-sel); }
-.cell.correct { background: #0d2b1a !important; }
+.cell.correct { background: #1a3a2a !important; }
 
 .cell input {
   position: absolute; inset: 0;
@@ -149,7 +155,7 @@ body {
   top: 2px; left: 3px;
   font-size: 7px;
   line-height: 1;
-  color: #52525b;
+  color: var(--muted);
   pointer-events: none;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
@@ -173,21 +179,21 @@ body {
 }
 .btn-verify {
   background: var(--accent);
-  color: #09090b;
+  color: #180b10;
 }
-.btn-verify:hover { background: #f5ead4; }
+.btn-verify:hover { background: #fbc8e0; }
 .btn-erase {
   background: var(--surface);
   color: var(--muted);
   border: 1px solid var(--border2);
 }
-.btn-erase:hover { background: #1f1f23; color: var(--text); }
+.btn-erase:hover { background: #3d1a2a; color: var(--text); }
 .btn-share {
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border2);
 }
-.btn-share:hover { background: #1f1f23; }
+.btn-share:hover { background: #3d1a2a; }
 .btn-copied {
   background: #064e3b !important;
   color: #6ee7b7 !important;
@@ -207,9 +213,9 @@ body {
   font-size: 13px;
   line-height: 1.45;
 }
-.clue-item:hover { background: #1c1c20; }
+.clue-item:hover { background: #3d1a2a; }
 .clue-item.active {
-  background: #162032;
+  background: #4a1230;
   border-left-color: var(--blue);
 }
 .clue-num {
@@ -220,12 +226,12 @@ body {
   font-size: 12px;
   padding-top: 1px;
 }
-.clue-text { color: #d4d4d8; }
+.clue-text { color: #f3d0e0; }
 
 /* ── MOBILE CLUE BAR ── */
 #mobile-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: #111113;
+  background: #22111a;
   border-top: 2px solid var(--border2);
   padding: 12px 16px 16px;
   z-index: 60;
@@ -253,7 +259,7 @@ body {
   position: fixed;
   bottom: 24px; left: 50%;
   transform: translateX(-50%) translateY(8px);
-  background: #1c0a0e;
+  background: #2d0a14;
   color: #fda4af;
   border: 1px solid #881337;
   padding: 10px 18px;
@@ -304,7 +310,7 @@ body {
 .modal-actions { margin-top: 24px; display: flex; gap: 10px; justify-content: center; }
 .btn-modal-share {
   background: var(--accent);
-  color: #09090b;
+  color: #180b10;
   padding: 10px 24px;
   border-radius: 3px;
   font-weight: 700;
@@ -314,7 +320,7 @@ body {
   display: inline-flex; align-items: center; gap: 6px;
   transition: all 0.15s;
 }
-.btn-modal-share:hover { background: #f5ead4; }
+.btn-modal-share:hover { background: #fbc8e0; }
 .btn-modal-close {
   background: transparent;
   color: var(--muted);
@@ -327,12 +333,16 @@ body {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 700px) {
-  .masthead { padding: 14px 16px 12px; }
-  .app { padding: 14px 12px 80px; }
+  .masthead { padding: 14px 0 12px; }
+  .masthead-inner { padding: 0 12px; }
+  .app { padding: 14px 12px 40px; }
   .right-col { display: none; }
   #toast { bottom: 80px; }
   .cell { width: 30px; height: 30px; }
   .cell input { font-size: 13px; }
+  /* Move action buttons above the grid so clue bar never covers them */
+  .left-col { display: flex; flex-direction: column; }
+  .actions { order: -1; margin-top: 0; margin-bottom: 12px; }
 }
 </style>
 </head>
@@ -340,13 +350,15 @@ body {
 
 <!-- Masthead -->
 <header class="masthead">
-  <div>
-    <div class="masthead-title">Mots Croisés</div>
-    <div class="masthead-sub" id="theme-sub">du Jour</div>
-  </div>
-  <div class="masthead-meta">
-    <span class="timer" id="timer">00:00</span>
-    <span class="tries-badge" id="tries-badge">0 essai</span>
+  <div class="masthead-inner">
+    <div>
+      <div class="masthead-title">Mots Croisés</div>
+      <div class="masthead-sub" id="theme-sub">du Jour</div>
+    </div>
+    <div class="masthead-meta">
+      <span class="timer" id="timer">00:00</span>
+      <span class="tries-badge" id="tries-badge">0 essai</span>
+    </div>
   </div>
 </header>
 
@@ -392,7 +404,7 @@ body {
 <!-- Success modal -->
 <div id="modal-overlay">
   <div class="modal">
-    <div class="modal-icon">⛳</div>
+    <div class="modal-icon">🌸</div>
     <div class="modal-title">Félicitations !</div>
     <p class="modal-stat" id="m-time"></p>
     <p class="modal-stat" id="m-tries"></p>
@@ -437,6 +449,18 @@ function fmtTime(secs) {
 }
 function cellEl(r, c) { return document.querySelector(`[data-r="${r}"][data-c="${c}"]`); }
 
+// ── Mobile bar keyboard avoidance ──────────────────────────────────────────
+function updateBarPosition() {
+  if (!window.visualViewport) return;
+  const bar = document.getElementById('mobile-bar');
+  const offset = window.innerHeight - window.visualViewport.offsetTop - window.visualViewport.height;
+  bar.style.bottom = Math.max(0, offset) + 'px';
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateBarPosition);
+  window.visualViewport.addEventListener('scroll', updateBarPosition);
+}
+
 // ── Load ───────────────────────────────────────────────────────────────────
 async function boot() {
   S.dateStr = today();
@@ -445,7 +469,7 @@ async function boot() {
   if (!data) {
     try { const r = await fetch('data/golf-fallback.json'); if (r.ok) data = await r.json(); } catch(e) {}
   }
-  if (!data) { document.body.innerHTML = '<p style="padding:2rem;color:#f43f5e">Impossible de charger le puzzle.</p>'; return; }
+  if (!data) { document.body.innerHTML = '<p style="padding:2rem;color:#fb7185">Impossible de charger le puzzle.</p>'; return; }
   init(data);
 }
 
@@ -586,6 +610,7 @@ function showMobileClue(w) {
     `${w.num}. ${w.direction === 'H' ? 'Horizontalement' : 'Verticalement'}`;
   document.getElementById('mb-clue').textContent = w.clue;
   document.getElementById('mobile-bar').classList.add('open');
+  updateBarPosition();
 }
 
 // ── Cell events ────────────────────────────────────────────────────────────
@@ -605,10 +630,10 @@ function tap(r, c) {
 
 function kdown(e, r, c) {
   if (S.done) return;
-  // For printable letters: clear the cell first so `input` always fires, even if same letter
+  // Clear cell first so `input` always fires, even if same letter typed twice
   if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
     e.target.value = '';
-    return; // let keydown propagate so browser inserts the char, triggering input event
+    return;
   }
   if (e.key === 'ArrowRight') { e.preventDefault(); move(r, c, 0, 1); return; }
   if (e.key === 'ArrowLeft')  { e.preventDefault(); move(r, c, 0,-1); return; }
@@ -636,7 +661,6 @@ function kinput(e, r, c) {
   const k = key(r, c);
   if (letter) {
     S.input.set(k, letter);
-    // Update all inputs sharing this cell (intersection)
     const el = document.querySelector(`[data-r="${r}"][data-c="${c}"] input`);
     if (el) el.value = letter;
     S.dir === 'H' ? move(r, c, 0, 1) : move(r, c, 1, 0);
